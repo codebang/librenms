@@ -66,6 +66,46 @@ if ($_POST['hostname']) {
         }
 
         $port_assoc_mode = $_POST['port_assoc_mode'];
+
+        // CLI transport
+        if ($_POST['transporttype'] and $_POST['transporttype'] != 'none') {
+            $transporttype = $_POST['transporttype'];
+        }
+        else {
+            $transporttype = "";
+        }
+        if ($_POST['transportport']) {
+            $transportport = $_POST['transportport'];
+        }
+        else {
+            $transportport = "";
+        }
+        if ($_POST['username']) {
+            $username = $_POST['username'];
+        }
+        else {
+            $username = "";
+        }
+        if ($_POST['password']) {
+            $password = $_POST['password'];
+        }
+        else {
+            $password = "";
+        }
+        if ($_POST['enablepassword']) {
+            $enablepassword = $_POST['enablepassword'];
+        }
+        else {
+            $enablepassword = "";
+        }
+        if ($_POST['loginprompt']) {
+            $loginprompt = $_POST['loginprompt'];
+        }
+        else {
+            $loginprompt = "";
+        }
+
+
         $result = addHost($hostname, $snmpver, $port, $transport, 0, $poller_group, $force_add, $port_assoc_mode);
         if ($result) {
             print_message("Device added ($result)");
@@ -240,6 +280,44 @@ if ($config['distributed_poller'] === true) {
 }//end if
 
 ?>
+      <div id="cli">
+          <div class="form-group">
+              <div class="col-sm-12 alert alert-info">
+                  <label class="control-label text-left input-sm">CLI Transport Configuration</label>
+              </div>
+          </div>
+          <div class="form-group">
+              <label for="transporttype" class="col-sm-3 control-label">Transport Type</label>
+              <div class="col-sm-3">
+                  <select name="transporttype" id="transporttype" class="form-control input-sm">
+                      <option value="none" selected>None</option>
+                      <option value="telnet">Telnet</option>
+                      <option value="SSHv2">SSH V2</option>
+                  </select>
+              </div>
+              <div class="col-sm-3">
+                  <input type="text" name="transportport" placeholder="transport port" class="form-control input-sm">
+              </div>
+          </div>
+          <div class="form-group">
+              <label for="clicredential" class="col-sm-3 control-label">Credential</label>
+              <div class="col-sm-3">
+                  <input type="text" name="username" placeholder="username" class="form-control input-sm">
+              </div>
+              <div class="col-sm-3">
+                  <input type="text" name="password" placeholder="password" class="form-control input-sm">
+              </div>
+              <div class="col-sm-3">
+                  <input type="text" name="enablepassword" placeholder="enable password" class="form-control input-sm">
+              </div>
+          </div>
+          <div class="form-group">
+              <label for="loginprompt" class="col-sm-3 control-label">Login Prompt</label>
+              <div class="col-sm-6">
+                  <input type="text" name="loginprompt" placeholder="login prompt" class="form-control input-sm">
+              </div>
+          </div>
+      </div>
     <hr>
     <center><button type="submit" class="btn btn-default" name="Submit">Add Device</button></center>
   </div>
