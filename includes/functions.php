@@ -246,7 +246,8 @@ function delete_device($id) {
     return $ret;
 }
 
-function addHost($host, $snmpver, $port = '161', $transport = 'udp', $quiet = '0', $poller_group = '0', $force_add = '0', $port_assoc_mode = 'ifIndex') {
+function addHost($host, $snmpver, $port = '161', $transport = 'udp', $quiet = '0', $poller_group = '0', $force_add = '0', $port_assoc_mode = 'ifIndex',
+            $transport_type,$transport_port,$transport_username,$transport_password,$transport_enablepassword) {
     global $config;
 
     list($hostshort) = explode(".", $host);
@@ -272,15 +273,15 @@ function addHost($host, $snmpver, $port = '161', $transport = 'udp', $quiet = '0
                 if (empty($snmpver)) {
                     // Try SNMPv2c
                     $snmpver = 'v2c';
-                    $ret = addHost($host, $snmpver, $port, $transport, $quiet, $poller_group, $force_add, $port_assoc_mode);
+                    $ret = addHost($host, $snmpver, $port, $transport, $quiet, $poller_group, $force_add, $port_assoc_mode,$transport_type,$transport_port,$transport_username,$transport_password,$transport_enablepassword);
                     if (!$ret) {
                         //Try SNMPv3
                         $snmpver = 'v3';
-                        $ret = addHost($host, $snmpver, $port, $transport, $quiet, $poller_group, $force_add, $port_assoc_mode);
+                        $ret = addHost($host, $snmpver, $port, $transport, $quiet, $poller_group, $force_add, $port_assoc_mode,$transport_type,$transport_port,$transport_username,$transport_password,$transport_enablepassword);
                         if (!$ret) {
                             // Try SNMPv1
                             $snmpver = 'v1';
-                            return addHost($host, $snmpver, $port, $transport, $quiet, $poller_group, $force_add, $port_assoc_mode);
+                            return addHost($host, $snmpver, $port, $transport, $quiet, $poller_group, $force_add, $port_assoc_mode,$transport_type,$transport_port,$transport_username,$transport_password,$transport_enablepassword);
                         }
                         else {
                             return $ret;
@@ -299,7 +300,7 @@ function addHost($host, $snmpver, $port = '161', $transport = 'udp', $quiet = '0
                         if ($force_add == 1 || isSNMPable($device)) {
                             $snmphost = snmp_get($device, "sysName.0", "-Oqv", "SNMPv2-MIB");
                             if (empty($snmphost) or ($snmphost == $host || $hostshort = $host)) {
-                                $device_id = createHost ($host, NULL, $snmpver, $port, $transport, $v3, $poller_group, $port_assoc_mode, $snmphost);
+                                $device_id = createHost ($host, NULL, $snmpver, $port, $transport, $v3, $poller_group, $port_assoc_mode, $snmphost,$transport_type,$transport_port,$transport_username,$transport_password,$transport_enablepassword);
                                 return $device_id;
                             }
                             else {
@@ -325,7 +326,7 @@ function addHost($host, $snmpver, $port = '161', $transport = 'udp', $quiet = '0
                         if ($force_add == 1 || isSNMPable($device)) {
                             $snmphost = snmp_get($device, "sysName.0", "-Oqv", "SNMPv2-MIB");
                             if (empty($snmphost) || ($snmphost && ($snmphost == $host || $hostshort = $host))) {
-                                $device_id = createHost ($host, $community, $snmpver, $port, $transport,array(),$poller_group, $port_assoc_mode, $snmphost);
+                                $device_id = createHost ($host, $community, $snmpver, $port, $transport,array(),$poller_group, $port_assoc_mode, $snmphost,$transport_type,$transport_port,$transport_username,$transport_password,$transport_enablepassword);
                                 return $device_id;
                             }
                             else {
@@ -575,7 +576,8 @@ function getpollergroup($poller_group='0') {
     }
 }
 
-function createHost($host, $community = NULL, $snmpver, $port = 161, $transport = 'udp', $v3 = array(), $poller_group='0', $port_assoc_mode = 'ifIndex', $snmphost) {
+function createHost($host, $community = NULL, $snmpver, $port = 161, $transport = 'udp', $v3 = array(), $poller_group='0', $port_assoc_mode = 'ifIndex', $snmphost,
+    $transport_type,$transport_port,$transport_username,$transport_password,$transport_enablepassword) {
     global $config;
     $host = trim(strtolower($host));
 
@@ -596,6 +598,11 @@ function createHost($host, $community = NULL, $snmpver, $port = 161, $transport 
         'poller_group' => $poller_group,
         'status_reason' => '',
         'port_association_mode' => $port_assoc_mode,
+        'transport_type' => $transporttype,
+        'transport_port' => $transportport,
+        'transport_username' => $transport_username,
+        'transport_password' => $transport_password,
+        'transport_enablepassword' => $transportport_enablepassword
     );
 
     $device = array_merge($device, $v3);
@@ -607,7 +614,6 @@ function createHost($host, $community = NULL, $snmpver, $port = 161, $transport 
         if (host_exists($host, $snmphost) === false) {
             $device_id = dbInsert($device, 'devices');
             if ($device_id) {
-                oxidized_reload_nodes();
                 return($device_id);
             }
             else {

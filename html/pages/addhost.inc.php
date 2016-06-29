@@ -69,44 +69,39 @@ if ($_POST['hostname']) {
 
         // CLI transport
         if ($_POST['transporttype'] and $_POST['transporttype'] != 'none') {
-            $transporttype = $_POST['transporttype'];
+            $transport_type = $_POST['transporttype'];
         }
         else {
-            $transporttype = "";
+            $transport_type = "";
         }
         if ($_POST['transportport']) {
-            $transportport = $_POST['transportport'];
+            $transport_port = $_POST['transportport'];
         }
         else {
-            $transportport = "";
+            $transport_port = "";
         }
         if ($_POST['username']) {
-            $username = $_POST['username'];
+            $transport_username = $_POST['username'];
         }
         else {
-            $username = "";
+            $transport_username = "";
         }
         if ($_POST['password']) {
-            $password = $_POST['password'];
+            $transport_password = $_POST['password'];
         }
         else {
-            $password = "";
+            $transport_password = "";
         }
         if ($_POST['enablepassword']) {
-            $enablepassword = $_POST['enablepassword'];
+            $transport_enablepassword = $_POST['enablepassword'];
         }
         else {
-            $enablepassword = "";
-        }
-        if ($_POST['loginprompt']) {
-            $loginprompt = $_POST['loginprompt'];
-        }
-        else {
-            $loginprompt = "";
+            $transport_enablepassword = "";
         }
 
 
-        $result = addHost($hostname, $snmpver, $port, $transport, 0, $poller_group, $force_add, $port_assoc_mode);
+        $result = addHost($hostname, $snmpver, $port, $transport, 0, $poller_group, $force_add, 
+              $port_assoc_mode,$transport_type,$transport_port,$transport_username,$transport_password,$transport_enablepassword);
         if ($result) {
             print_message("Device added ($result)");
         }
@@ -309,12 +304,6 @@ if ($config['distributed_poller'] === true) {
               </div>
               <div class="col-sm-3">
                   <input type="text" name="enablepassword" placeholder="enable password" class="form-control input-sm">
-              </div>
-          </div>
-          <div class="form-group">
-              <label for="loginprompt" class="col-sm-3 control-label">Login Prompt</label>
-              <div class="col-sm-6">
-                  <input type="text" name="loginprompt" placeholder="login prompt" class="form-control input-sm">
               </div>
           </div>
       </div>

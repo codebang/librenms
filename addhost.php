@@ -19,7 +19,9 @@ require 'config.php';
 require 'includes/definitions.inc.php';
 require 'includes/functions.php';
 
-$options = getopt('g:p:f::');
+$options = getopt('g:p:f::t::u::c::e::');
+
+
 
 if (isset($options['g']) && $options['g'] >= 0) {
     $cmd = array_shift($argv);
@@ -54,6 +56,57 @@ if (isset ($options['p'])) {
     array_shift($argv);
     array_unshift($argv, $cmd);
 }
+
+if (isset($options['t']) && $options['t'] >= 0) {
+    $cmd = array_shift($argv);
+    array_shift($argv);
+    array_shift($argv);
+    array_unshift($argv, $cmd);
+    #ssh:22(trapsport_type: transport_port)
+    $transport_parameter= $options['t'];
+}
+else{
+    $transport_type = null;
+    $transport_port = null;
+}
+
+if (isset($options['u']) && $options['u'] >= 0) {
+    $cmd = array_shift($argv);
+    array_shift($argv);
+    array_shift($argv);
+    array_unshift($argv, $cmd);
+    #transport_username
+    $transport_username = $options['u'];
+}
+else{
+    $transport_username = null;
+}
+
+if (isset($options['c']) && $options['c'] >= 0) {
+    $cmd = array_shift($argv);
+    array_shift($argv);
+    array_shift($argv);
+    array_unshift($argv, $cmd);
+    #transport_password
+    $transport_password = $options['c'];
+}
+else{
+    $transport_password = null;
+}
+
+if (isset($options['e']) && $options['e'] >= 0) {
+    $cmd = array_shift($argv);
+    array_shift($argv);
+    array_shift($argv);
+    array_unshift($argv, $cmd);
+    #transport_enablepassword
+    $transport_enablepassword = $options['e'];
+}
+else{
+    $transport_enablepassword = null;
+}
+
+
 
 if (!empty($argv[1])) {
     $host      = strtolower($argv[1]);
@@ -98,7 +151,7 @@ if (!empty($argv[1])) {
                 array_push($config['snmp']['v3'], $v3);
             }
 
-            $device_id = addHost($host, $snmpver, $port, $transport, 0, $poller_group, $force_add, $port_assoc_mode);
+            $device_id = addHost($host, $snmpver, $port, $transport, 0, $poller_group, $force_add, $port_assoc_mode,$transport_type,$transport_port,$transport_username,$transport_password,$transport_enablepassword);
         }
         else if ($seclevel === 'anp' or $seclevel === 'authNoPriv') {
             $v3['authlevel'] = 'authNoPriv';
@@ -124,7 +177,7 @@ if (!empty($argv[1])) {
             }
 
             array_push($config['snmp']['v3'], $v3);
-            $device_id = addHost($host, $snmpver, $port, $transport, 0, $poller_group, $force_add, $port_assoc_mode);
+            $device_id = addHost($host, $snmpver, $port, $transport, 0, $poller_group, $force_add, $port_assoc_mode,$transport_type,$transport_port,$transport_username,$transport_password,$transport_enablepassword);
         }
         else if ($seclevel === 'ap' or $seclevel === 'authPriv') {
             $v3['authlevel']  = 'authPriv';
@@ -154,7 +207,7 @@ if (!empty($argv[1])) {
             }//end while
 
             array_push($config['snmp']['v3'], $v3);
-            $device_id = addHost($host, $snmpver, $port, $transport, 0, $poller_group, $force_add, $port_assoc_mode);
+            $device_id = addHost($host, $snmpver, $port, $transport, 0, $poller_group, $force_add, $port_assoc_mode,$transport_type,$transport_port,$transport_username,$transport_password,$transport_enablepassword);
         }
         else {
             // Error or do nothing ?
@@ -180,7 +233,7 @@ if (!empty($argv[1])) {
             $config['snmp']['community'] = array($community);
         }
 
-        $device_id = addHost($host, $snmpver, $port, $transport, 0, $poller_group, $force_add, $port_assoc_mode);
+        $device_id = addHost($host, $snmpver, $port, $transport, 0, $poller_group, $force_add, $port_assoc_mode,$transport_type,$transport_port,$transport_username,$transport_password,$transport_enablepassword);
     }//end if
 
     if ($snmpver) {
@@ -196,7 +249,7 @@ if (!empty($argv[1])) {
 
     while (!$device_id && count($snmpversions)) {
         $snmpver   = array_shift($snmpversions);
-        $device_id = addHost($host, $snmpver, $port, $transport, 0, $poller_group, $force_add, $port_assoc_mode);
+        $device_id = addHost($host, $snmpver, $port, $transport, 0, $poller_group, $force_add, $port_assoc_mode,$transport_type,$transport_port,$transport_username,$transport_password,$transport_enablepassword);
     }
 
     if ($device_id) {

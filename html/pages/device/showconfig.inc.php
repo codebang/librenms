@@ -4,10 +4,6 @@ require 'includes/geshi/geshi.php';
 
 // FIXME svn stuff still using optc etc, won't work, needs updating!
 if (is_admin()) {
-    if (!is_array($config['rancid_configs'])) {
-        $config['rancid_configs'] = array($config['rancid_configs']);
-    }
-
 //    if (isset($config['rancid_configs'][0])) {
 //        foreach ($config['rancid_configs'] as $configs) {
 //            if ($configs[(strlen($configs) - 1)] != '/') {
@@ -188,11 +184,11 @@ if (is_admin()) {
             echo '<br />
                 <div class="row">
             ';
-            $node_info['last']['status'] = 'OK';
-            $node_info['name'] = 'switch 1';
-            $node_info['ip'] = '192.168.100.10';
-            $node_info['model'] = 'H3C';
-            $node_info['last']['end'] = '2016-6-22 9:30:00';
+            $node_info['last']['status'] = $device['transport_status'];
+            $node_info['name'] = $device['hostname'];
+            $node_info['ip'] = $device['hostname'];
+            $node_info['model'] = $device['os'];
+            $node_info['last']['end'] = $device['last_trans_time'];
 
             if (is_array($node_info)) {
                 echo '
@@ -210,59 +206,59 @@ if (is_admin()) {
                 ';
             }
 
-            $config_total = 2;
-            $config_versions[] = ['oid' => '.1.1.1', 'date' => '2016-1-1'];
-            $config_versions[] = ['oid' => '.2.2.2', 'date' => '2016-1-2'];
-            $current_config = ['oid' => '.1.1.1', 'date' => '2016-1-1'];
-            $previous_config = ['oid' => '.3.3.3', 'date' => '2016-1-3'];
-            if ($config_total > 1) {
-                echo '
-                    <div class="col-sm-8">
-                        <form class="form-horizontal" action="" method="post">
-                            <div class="form-group">
-                                <label for="config" class="col-sm-2 control-label">Config version</label>
-                                <div class="col-sm-6">
-                                    <select id="config" name="config" class="form-control">
-                ';
+            // $config_total = 2;
+            // $config_versions[] = ['oid' => '.1.1.1', 'date' => '2016-1-1'];
+            // $config_versions[] = ['oid' => '.2.2.2', 'date' => '2016-1-2'];
+            // $current_config = ['oid' => '.1.1.1', 'date' => '2016-1-1'];
+            // $previous_config = ['oid' => '.3.3.3', 'date' => '2016-1-3'];
+            // if ($config_total > 1) {
+            //     echo '
+            //         <div class="col-sm-8">
+            //             <form class="form-horizontal" action="" method="post">
+            //                 <div class="form-group">
+            //                     <label for="config" class="col-sm-2 control-label">Config version</label>
+            //                     <div class="col-sm-6">
+            //                         <select id="config" name="config" class="form-control">
+            //     ';
 
-                $i = $config_total;
-                foreach ($config_versions as $version) {
-                    echo '<option value="'.$version['oid'].'|'.$version['date'].'|'.$config_total.'" ';
-                    if ($current_config['oid'] == $version['oid']) {
-                        if (isset($previous_config)) {
-                            echo 'selected>+';
-                        }
-                        else {
-                            echo 'selected>*';
-                        }
-                    }
-                    else if ($previous_config['oid'] == $version['oid']) {
-                        echo '>&nbsp;-';
-                    }
-                    else {
-                        echo '>&nbsp;&nbsp;';
-                    }
-                    echo $i.' :: '.$version['date'].'</option>';
-                    $i--;
-                }
+            //     $i = $config_total;
+            //     foreach ($config_versions as $version) {
+            //         echo '<option value="'.$version['oid'].'|'.$version['date'].'|'.$config_total.'" ';
+            //         if ($current_config['oid'] == $version['oid']) {
+            //             if (isset($previous_config)) {
+            //                 echo 'selected>+';
+            //             }
+            //             else {
+            //                 echo 'selected>*';
+            //             }
+            //         }
+            //         else if ($previous_config['oid'] == $version['oid']) {
+            //             echo '>&nbsp;-';
+            //         }
+            //         else {
+            //             echo '>&nbsp;&nbsp;';
+            //         }
+            //         echo $i.' :: '.$version['date'].'</option>';
+            //         $i--;
+            //     }
 
-                echo '
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <div class="col-sm-offset-2 col-sm-6">
-                                      <input type="hidden" name="prevconfig" value="';
-                echo implode('|',$current_config);
-                echo '">
-                                      <button type="submit" class="btn btn-primary btn-sm" name="show">Show version</button>
-                                      <button type="submit" class="btn btn-primary btn-sm" name="diff">Show diff</button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                ';
-            }
+            //     echo '
+            //                         </select>
+            //                     </div>
+            //                 </div>
+            //                 <div class="form-group">
+            //                     <div class="col-sm-offset-2 col-sm-6">
+            //                           <input type="hidden" name="prevconfig" value="';
+            //     echo implode('|',$current_config);
+            //     echo '">
+            //                           <button type="submit" class="btn btn-primary btn-sm" name="show">Show version</button>
+            //                           <button type="submit" class="btn btn-primary btn-sm" name="diff">Show diff</button>
+            //                     </div>
+            //                 </div>
+            //             </form>
+            //         </div>
+            //     ';
+            // }
 
             echo '</div>';
         }
@@ -272,14 +268,15 @@ if (is_admin()) {
 //            $text = '';
 //        }
 //    }//end if
-    $text = 'interface gi0/0
-                ip address 192.168.1.1 255.255.255.0';
+    $cmd = 'display current'
+    exec(“python /opt/librenms/device_executor.py -d {$device['hostname']} -u {$device['transport_username']} -a {$device['transport_password']} -m {$device['os']} {$cmd}”,$array,$ret);
+    $text =  implode("\r\n",$array);
     if (!empty($text)) {
-        if (isset($previous_config)) {
-            $language = 'diff';
-        } else {
-            $language = 'ios';
-        }
+        // if (isset($previous_config)) {
+        //     $language = 'diff';
+        // } else {
+        $language = 'ios';
+        // }
         $geshi = new GeSHi($text, $language);
         $geshi->enable_line_numbers(GESHI_FANCY_LINE_NUMBERS);
         $geshi->set_overall_style('color: black;');
