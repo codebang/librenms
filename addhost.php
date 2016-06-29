@@ -19,7 +19,7 @@ require 'config.php';
 require 'includes/definitions.inc.php';
 require 'includes/functions.php';
 
-$options = getopt('g:p:f::t::u::c::e::');
+$options = getopt('g:p:f::t:u:c:e:');
 
 
 
