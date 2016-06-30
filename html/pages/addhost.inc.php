@@ -1,13 +1,11 @@
 <?php
 
 $no_refresh = true;
-
 if ($_SESSION['userlevel'] < 10) {
     include 'includes/error-no-perm.inc.php';
 
     exit;
 }
-
 if ($_POST['hostname']) {
     echo '<div class="row">
             <div class="col-sm-3">
@@ -16,6 +14,7 @@ if ($_POST['hostname']) {
     if ($_SESSION['userlevel'] > '5') {
         // Settings common to SNMPv2 & v3
         $hostname = mres($_POST['hostname']);
+        echo 'fck';
         if ($_POST['port']) {
             $port = mres($_POST['port']);
         }
@@ -80,28 +79,40 @@ if ($_POST['hostname']) {
         else {
             $transport_port = "";
         }
-        if ($_POST['username']) {
-            $transport_username = $_POST['username'];
+        if ($_POST['transport_username']) {
+            $transport_username = $_POST['transport_username'];
         }
         else {
             $transport_username = "";
         }
-        if ($_POST['password']) {
-            $transport_password = $_POST['password'];
+        if ($_POST['transport_password']) {
+            $transport_password = $_POST['transport_password'];
         }
         else {
             $transport_password = "";
         }
-        if ($_POST['enablepassword']) {
-            $transport_enablepassword = $_POST['enablepassword'];
+        if ($_POST['transport_enablepassword']) {
+            $transport_enablepassword = $_POST['transport_enablepassword'];
         }
         else {
             $transport_enablepassword = "";
         }
-
+        if ($_POST['accountName']){
+            $accountName = $_POST['accountName'];
+        }
+        else{
+           $accountName = 'none';
+        }
+        if ($_POST['dms_location']){
+           $dms_location = $_POST['dms_location'];
+        }
+        else{
+           $dms_location = 'none';
+        }
 
         $result = addHost($hostname, $snmpver, $port, $transport, 0, $poller_group, $force_add, 
-              $port_assoc_mode,$transport_type,$transport_port,$transport_username,$transport_password,$transport_enablepassword);
+              $port_assoc_mode,$transport_type,$transport_port,$transport_username,$transport_password,$transport_enablepassword,$accountName,$dms_location);
+         
         if ($result) {
             print_message("Device added ($result)");
         }
@@ -275,7 +286,6 @@ if ($config['distributed_poller'] === true) {
 }//end if
 
 ?>
-      <div id="cli">
           <div class="form-group">
               <div class="col-sm-12 alert alert-info">
                   <label class="control-label text-left input-sm">CLI Transport Configuration</label>
@@ -297,16 +307,50 @@ if ($config['distributed_poller'] === true) {
           <div class="form-group">
               <label for="clicredential" class="col-sm-3 control-label">Credential</label>
               <div class="col-sm-3">
-                  <input type="text" name="username" placeholder="username" class="form-control input-sm">
+                  <input type="text" name="transport_username" placeholder="username" class="form-control input-sm">
               </div>
               <div class="col-sm-3">
-                  <input type="text" name="password" placeholder="password" class="form-control input-sm">
+                  <input type="text" name="transport_password" placeholder="password" class="form-control input-sm">
               </div>
               <div class="col-sm-3">
-                  <input type="text" name="enablepassword" placeholder="enable password" class="form-control input-sm">
+                  <input type="text" name="transport_enablepassword" placeholder="enable password" class="form-control input-sm">
               </div>
           </div>
-      </div>
+          <div class='form-group'>
+              <div class="col-sm-12 alert alert-info">
+                  <label class="control-label text-left input-sm">DMS Configuration(optional)</label>
+              </div>
+          </div>
+          <div class="form-group">
+              <label for="accountName" class="col-sm-3 control-label">Account Name</label>
+              <div class="col-sm-9">
+                  <select name="accountName" id="accountName" class="form-control input-sm">
+                      <?php
+                           $cmd="python ".$config["install_dir"]."/python_scripts/dms_manager.py -d {$config['dso_url']} -r {$config['redis_server']} listaccountnames";
+                           exec($cmd,$accounts,$ret);
+                           array_unshift($accounts,"none");
+                           foreach ($accounts as $account){
+                               echo "<option value={$account}>{$account}</option>";
+                           }
+                      ?>
+                  </select>
+              </div>
+          </div>
+          <div class="form-group">
+              <label for="location" class="col-sm-3 control-label">location</label>
+              <div class="col-sm-9">
+                  <select name="dms_location" id="location" class="form-control input-sm">
+                      <?php
+                           $cmd="python ".$config["install_dir"]."/python_scripts/dms_manager.py -d {$config['dso_url']} -r {$config['redis_server']} listlocations";
+                           exec($cmd,$locations,$ret);
+                           array_unshift($locations,"none");
+                           foreach ($locations as $location){
+                               echo "<option value={$location}>{$location}</option>";
+                           }
+                      ?>
+                  </select>
+              </div>
+          </div>
     <hr>
     <center><button type="submit" class="btn btn-default" name="Submit">Add Device</button></center>
   </div>

@@ -19,7 +19,7 @@ require 'config.php';
 require 'includes/definitions.inc.php';
 require 'includes/functions.php';
 
-$options = getopt('g:p:f::t:u:c:e:');
+$options = getopt('g:p:f::t:u:c:e:a:l:');
 
 
 
@@ -105,8 +105,27 @@ if (isset($options['e']) && $options['e'] >= 0) {
 else{
     $transport_enablepassword = null;
 }
+if (isset($options['a'])) {
+    $cmd = array_shift($argv);
+    array_shift($argv);
+    array_shift($argv);
+    array_unshift($argv, $cmd);
+    $accountName = $options['a'];
+}
+else{
+    $accountName = 'none';
+}
 
-
+if (isset($options['l'])) {
+    $cmd = array_shift($argv);
+    array_shift($argv);
+    array_shift($argv);
+    array_unshift($argv, $cmd);
+    $dms_location = $options['l'];
+}
+else{
+    $dms_location = 'none';
+}
 
 if (!empty($argv[1])) {
     $host      = strtolower($argv[1]);
@@ -151,7 +170,7 @@ if (!empty($argv[1])) {
                 array_push($config['snmp']['v3'], $v3);
             }
 
-            $device_id = addHost($host, $snmpver, $port, $transport, 0, $poller_group, $force_add, $port_assoc_mode,$transport_type,$transport_port,$transport_username,$transport_password,$transport_enablepassword);
+            $device_id = addHost($host, $snmpver, $port, $transport, 0, $poller_group, $force_add, $port_assoc_mode,$transport_type,$transport_port,$transport_username,$transport_password,$transport_enablepassword,$accountName,$dms_location);
         }
         else if ($seclevel === 'anp' or $seclevel === 'authNoPriv') {
             $v3['authlevel'] = 'authNoPriv';
@@ -177,7 +196,7 @@ if (!empty($argv[1])) {
             }
 
             array_push($config['snmp']['v3'], $v3);
-            $device_id = addHost($host, $snmpver, $port, $transport, 0, $poller_group, $force_add, $port_assoc_mode,$transport_type,$transport_port,$transport_username,$transport_password,$transport_enablepassword);
+            $device_id = addHost($host, $snmpver, $port, $transport, 0, $poller_group, $force_add, $port_assoc_mode,$transport_type,$transport_port,$transport_username,$transport_password,$transport_enablepassword,$accountName,$dms_location);
         }
         else if ($seclevel === 'ap' or $seclevel === 'authPriv') {
             $v3['authlevel']  = 'authPriv';
@@ -207,7 +226,7 @@ if (!empty($argv[1])) {
             }//end while
 
             array_push($config['snmp']['v3'], $v3);
-            $device_id = addHost($host, $snmpver, $port, $transport, 0, $poller_group, $force_add, $port_assoc_mode,$transport_type,$transport_port,$transport_username,$transport_password,$transport_enablepassword);
+            $device_id = addHost($host, $snmpver, $port, $transport, 0, $poller_group, $force_add, $port_assoc_mode,$transport_type,$transport_port,$transport_username,$transport_password,$transport_enablepassword,$accountName,$dms_location);
         }
         else {
             // Error or do nothing ?
@@ -233,7 +252,7 @@ if (!empty($argv[1])) {
             $config['snmp']['community'] = array($community);
         }
 
-        $device_id = addHost($host, $snmpver, $port, $transport, 0, $poller_group, $force_add, $port_assoc_mode,$transport_type,$transport_port,$transport_username,$transport_password,$transport_enablepassword);
+        $device_id = addHost($host, $snmpver, $port, $transport, 0, $poller_group, $force_add, $port_assoc_mode,$transport_type,$transport_port,$transport_username,$transport_password,$transport_enablepassword,$accountName,$dms_location);
     }//end if
 
     if ($snmpver) {
@@ -249,7 +268,7 @@ if (!empty($argv[1])) {
 
     while (!$device_id && count($snmpversions)) {
         $snmpver   = array_shift($snmpversions);
-        $device_id = addHost($host, $snmpver, $port, $transport, 0, $poller_group, $force_add, $port_assoc_mode,$transport_type,$transport_port,$transport_username,$transport_password,$transport_enablepassword);
+        $device_id = addHost($host, $snmpver, $port, $transport, 0, $poller_group, $force_add, $port_assoc_mode,$transport_type,$transport_port,$transport_username,$transport_password,$transport_enablepassword,$accountName,$dms_location);
     }
 
     if ($device_id) {

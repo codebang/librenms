@@ -41,7 +41,7 @@ if __name__ == '__main__':
     device_model = mapping.get(options.deviceModel,None)
     if  device_model:
         device_meta = {
-            'device_type':options.deviceModel,
+            'device_type':device_model,
             'ip': options.managementIp,
             'username': options.userName,
             'password': options.password,

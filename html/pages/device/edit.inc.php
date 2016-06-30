@@ -14,6 +14,8 @@ else {
 
   $panes['device']   = 'Device Settings';
   $panes['snmp']     = 'SNMP';
+  $panes['transport'] = 'Transport';
+  $panes['dms'] = 'DMS';
   $panes['ports']    = 'Port Settings';
 
   if (count($config['os'][$device['os']]['icons'])) {
