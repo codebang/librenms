@@ -1323,3 +1323,29 @@ function list_ipsec() {
     $app->response->headers->set('Content-Type', 'application/json');
     echo _json_encode($output);
 }
+
+function activate_interfaces(){
+    global $config;
+    $app  = \Slim\Slim::getInstance();
+    $data = json_decode(file_get_contents('php://input'), true);
+    // Default status & code to error and change it if we need to.
+    $status = 'error';
+    $code   = 500;
+    $management_ip = $data['managementIp'];
+    $ports = $data['ports'];
+    $cmd = '"';
+    foreach ($ports as $port){
+           $cmd = $cmd."interface {$port};undo shutdown;quit;";
+    }
+    $cmd = $cmd."save;Y;\n".'"';
+    $device = dbFetchRow('SELECT * FROM `devices` WHERE `hostname` = ?', array($data['managementIp']));
+    exec("python /opt/librenms/device_executor.py -d {$device['hostname']} -u {$device['transport_username']} -a {$device['transport_password']} -m {$device['os']} {$cmd}",$array,$ret);    
+    $app->response->setStatus(200);
+    $output = array(
+        'status'  => "OK",
+        'message' => "python /opt/librenms/device_executor.py -d {$device['hostname']} -u {$device['transport_username']} -a {$device['transport_password']} -m {$device['os']} {$cmd}"
+    );
+    $app->response->headers->set('Content-Type', 'application/json');
+    echo _json_encode($output);
+
+}

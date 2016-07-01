@@ -1,5 +1,7 @@
 from optparse import OptionParser
 from netmiko import ConnectHandler
+from netmiko.ssh_exception import NetMikoTimeoutException
+import sys
 
 
 
@@ -49,10 +51,18 @@ if __name__ == '__main__':
             'secret': 'secret',
             'verbose': False,
         }
-
-        netconnect = ConnectHandler(**device_meta)
-        output  = netconnect.send_command(args[0])
-        netconnect.disconnect()
-        print output
+        cmds = args[0].split(";")
+        try:
+          netconnect = ConnectHandler(**device_meta)
+          for cmd in cmds:
+            if cmd == '\\n':
+              output = netconnect.send_command("\n")
+            else:
+              output  = netconnect.send_command(cmd)
+            print output
+          netconnect.disconnect()
+        except NetMikoTimeoutException:
+          print 'ssh to deivce timeout.'
+          sys.exit(-1)
     else:
         print error_desc['DEVICE_NOT_SUPPORT']

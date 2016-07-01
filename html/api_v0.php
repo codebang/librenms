@@ -64,8 +64,10 @@ $app->group(
                     }
                 );
                 $app->get('/devices', 'authToken', 'list_devices')->name('list_devices');
+                $app->get('/devices', 'list_devices')->name('list_devices');
                 // api/v0/devices
                 $app->post('/devices', 'authToken', 'add_device')->name('add_device');
+                $app->post('/interfaces/status', 'activate_interfaces')->name('activate_interfaces');
                 // api/v0/devices (json data needs to be passed)
                 $app->group(
                     '/devicegroups',
