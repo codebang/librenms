@@ -1333,7 +1333,7 @@ function activate_interfaces(){
     $code   = 500;
     $management_ip = $data['managementIp'];
     $ports = $data['ports'];
-    $cmd = '"';
+    $cmd = '"system-view;';
     foreach ($ports as $port){
            $cmd = $cmd."interface {$port};undo shutdown;quit;";
     }
@@ -1343,7 +1343,7 @@ function activate_interfaces(){
     $app->response->setStatus(200);
     $output = array(
         'status'  => "OK",
-        'message' => "python /opt/librenms/device_executor.py -d {$device['hostname']} -u {$device['transport_username']} -a {$device['transport_password']} -m {$device['os']} {$cmd}"
+        'message' => var_dump($array)
     );
     $app->response->headers->set('Content-Type', 'application/json');
     echo _json_encode($output);
