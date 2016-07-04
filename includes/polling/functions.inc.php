@@ -156,6 +156,7 @@ function poll_device($device, $options) {
     $status = 0;
     unset($array);
     $device_start = microtime(true);
+    echo "poll device";
     // Start counting device poll time
     echo $device['hostname'].' '.$device['device_id'].' '.$device['os'].' ';
     $ip = dnslookup($device);
@@ -234,8 +235,11 @@ function poll_device($device, $options) {
         // we always want the core module to be included
         include 'includes/polling/core.inc.php';
 
+        var_dump($options);
         if ($options['m']) {
+            echo 'test mac address';
             foreach (explode(',', $options['m']) as $module) {
+                var_dump('includes/polling/'.$module.'.inc.php');
                 if (is_file('includes/polling/'.$module.'.inc.php')) {
                     include 'includes/polling/'.$module.'.inc.php';
                 }

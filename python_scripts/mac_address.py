@@ -19,11 +19,20 @@ parser.add_option('-p','--redisport',dest='redis_port',help='redis-server')
 class MacEntry(object):
 
     def __init__(self,mac_addr,vlan_id,state,port_index,aging_time):
-        self.mac_addr = mac_addr
+        self.mac_addr = self.convert(mac_addr)
         self.vlan_id = vlan_id
         self.state = state
         self.port_index = port_index
         self.aging_time = aging_time
+
+    def convert(self,mac_addr):
+      if mac_addr is not None:
+         mac_array = mac_addr.split('-')
+      num = []
+      for mac in mac_array:
+         num.append(mac[0:2])
+         num.append(mac[2:4])
+      return ':'.join(num)
 
     @classmethod
     def fromData(cls,dataline):

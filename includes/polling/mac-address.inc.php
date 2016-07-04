@@ -1,8 +1,7 @@
 <?php
-   require '../../config.php';
-   require '../../test.php';
    if ($device['os'] == 'comware'){
       $cmd = '"display mac-address"';
+      var_dump("python /opt/librenms/device_executor.py -d {$device['hostname']} -u {$device['transport_username']} -a {$device['transport_password']} -m {$device['os']} {$cmd}");
       exec("python /opt/librenms/device_executor.py -d {$device['hostname']} -u {$device['transport_username']} -a {$device['transport_password']} -m {$device['os']} {$cmd}",$array,$ret);
       $text =  implode("\r\n",$array);
       echo $text;

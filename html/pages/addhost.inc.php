@@ -14,7 +14,6 @@ if ($_POST['hostname']) {
     if ($_SESSION['userlevel'] > '5') {
         // Settings common to SNMPv2 & v3
         $hostname = mres($_POST['hostname']);
-        echo 'fck';
         if ($_POST['port']) {
             $port = mres($_POST['port']);
         }

@@ -1334,8 +1334,10 @@ function activate_interfaces(){
     $management_ip = $data['managementIp'];
     $ports = $data['ports'];
     $cmd = '"system-view;';
-    foreach ($ports as $port){
-           $cmd = $cmd."interface {$port};undo shutdown;quit;";
+    foreach ($ports as $sw => $port_list){
+        foreach($port_list as $port){
+              $cmd = $cmd."interface {$port};undo shutdown;quit;";
+           }
     }
     $cmd = $cmd."save;Y;\n".'"';
     $device = dbFetchRow('SELECT * FROM `devices` WHERE `hostname` = ?', array($data['managementIp']));
@@ -1343,7 +1345,7 @@ function activate_interfaces(){
     $app->response->setStatus(200);
     $output = array(
         'status'  => "OK",
-        'message' => var_dump($array)
+        'message' => var_dump("python /opt/librenms/device_executor.py -d {$device['hostname']} -u {$device['transport_username']} -a {$device['transport_password']} -m {$device['os']} {$cmd}")
     );
     $app->response->headers->set('Content-Type', 'application/json');
     echo _json_encode($output);

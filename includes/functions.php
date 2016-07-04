@@ -615,6 +615,7 @@ function createHost($host, $community = NULL, $snmpver, $port = 161, $transport 
     if ($device['os']) {
 
         if (host_exists($host, $snmphost) === false) {
+            echo 'host exist';
             $device_id = dbInsert($device, 'devices');
             if ($device_id) {
                 notify_dso_for_create_switch($device);

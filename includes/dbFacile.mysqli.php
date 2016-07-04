@@ -44,7 +44,6 @@ function dbQuery($sql, $parameters=array()) {
         if($this->logFile)
         $time_start = microtime(true);
      */
-
     $result = mysqli_query($database_link, $fullSql);
     // sets $this->result
     /*
