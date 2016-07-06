@@ -610,6 +610,7 @@ function createHost($host, $community = NULL, $snmpver, $port = 161, $transport 
         'description' => $description
     );
 
+    logfile("$device");
     $device = array_merge($device, $v3);
 
     $device['os'] = getHostOS($device);
@@ -662,7 +663,10 @@ function notify_dso_for_create_switch($device){
    $switch['portcount'] = count($ports);
    $output = json_encode($switch);
    $cmd = "python {$install_dir}/python_scripts/dms_manager.py -d {$dso_url} -r {$redis_server} createswitch "."'"."{$output}"."'";
+   logfile('start to notify dso.');
+   logfile("$cmd");
    exec($cmd,$ret_desc,$ret_code);
+   logfile('end to notify dso');
    if($ret_code <0 ){
        print_error($ret_desc[0]);
    }

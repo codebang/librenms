@@ -27,8 +27,9 @@ if ($_POST['editing']) {
                    $dso_url = $config['dso_url'];
                    $redis_server = $config['redis_server'];
                    $redis_port = $config['redis_port'];
+                   logfile('start to notify dso to setup the relationship between device and switch');
+                   logfile("$cmd");
                    $cmd = "python {$install_dir}/python_scripts/dms_manager.py -d {$dso_url} -r {$redis_server} updateswitch_dms {$device['hostname']} {$accountName} {$dms_location} ";
-                   echo $cmd;
                    exec($cmd,$ret_desc,$ret_code);
                    if ($ret_code < 0){
                       print_error('failed to notify dso.');

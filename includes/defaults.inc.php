@@ -42,6 +42,7 @@ $config['project_id']   = strtolower($config['project_name']);
 $config['temp_dir']    = '/tmp';
 $config['install_dir'] = '/opt/'.$config['project_id'];
 $config['log_dir']     = $config['install_dir'].'/logs';
+$config['log_file'] = $config['log_dir'].'/tnms.log';
 
 // MySQL extension to use
 $config['db']['extension']       = 'mysql';//mysql and mysqli available
