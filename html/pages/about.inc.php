@@ -20,26 +20,6 @@ $git_log = `git log -10`;
 </div>
 <div style="margin: 10px;">
   <div style="float: right; padding: 0px; width: 49%">
-    <h3>License</h3>
-    <pre>
-Copyright (C) 2013-<?php echo date('Y').' '.$config['project_name']; ?> Contributors
-Copyright (C) 2006-2012 Adam Armstrong
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>.</pre>
-
-    &nbsp;
-
 
     <h3>Statistics</h3>
 
@@ -76,19 +56,13 @@ else {
      $stats_checked = '';
 }
 
-if (extension_loaded('curl')) {
-    $callback = 'Opt in to send anonymous usage statistics to LibreNMS? <input type="checkbox" data-on-text="Yes" data-off-text="No" data-size="mini" name="statistics" '.$stats_checked.'>';
-}
-else {
-    $callback = "PHP Curl module isn't installed, please install this, restart your web service and refresh this page.";
-}
 
 echo "
 <div class='table-responsive'>
     <table class='table table-condensed'>
       <tr>
         <td colspan='4'><span class='bg-danger'>$callback</span><br />
-        Online stats: <a href='https://stats.librenms.org/'>stats.librenms.org</a></td>
+        Online support: <a href='http://www.tethrnet.com/'>Tethrnet</a></td>
       <tr>";
 
 if (dbFetchCell("SELECT `value` FROM `callback` WHERE `name` = 'uuid'") != '' && $callback_status != 2) {
@@ -143,7 +117,7 @@ echo "
 
   <div style="float: left; padding: 0px; width: 49%">
 
-    <h3>LibreNMS is an autodiscovering PHP/MySQL-based network monitoring system.</h3>
+    <h3>Tethrnet NMS(TNMS) is an autodiscovering PHP/MySQL-based network monitoring system.</h3>
 <?php
 $versions = version_info();
 $project_name    = $config['project_name'];
@@ -160,7 +134,7 @@ $version         = `git rev-parse --short HEAD`;
 echo "
 <div class='table-responsive'>
     <table class='table table-condensed' border='0'>
-      <tr><td><b>Version</b></td><td><a href='http://www.librenms.org/changelog.html'>$version</a></td></tr>
+      <tr><td><b>Version</b></td><td>$version</td></tr>
       <tr><td><b>DB Schema</b></td><td>#$schema_version</td></tr>
       <tr><td><b>Apache</b></td><td>$apache_version</td></tr>
       <tr><td><b>PHP</b></td><td>$php_version</td></tr>
@@ -172,36 +146,9 @@ echo "
 
 
 ?>
-
-    <h5>LibreNMS is a community-based project. Please feel free to join us and contribute code, documentation, and bug reports:</h5>
-
-    <p>
-      <a href="http://www.librenms.org/">Web site</a> |
-      <a href="https://github.com/librenms/">GitHub</a> |
-      <a href="https://github.com/librenms/librenms/issues">Bug tracker</a> |
-      <a href="https://groups.google.com/forum/#!forum/librenms-project">Mailing list</a> |
-      <a href="http://twitter.com/librenms">Twitter</a> |
-      <a href="http://www.librenms.org/changelog.html">Changelog</a> |
-      <a href="#" data-toggle="modal" data-target="#git_log">Git log</a>
-    </p>
-
   <div style="margin-top:10px;">
   </div>
 
-    <h3>Contributors</h3>
-
-    <p>See the <a href="https://github.com/librenms/librenms/blob/master/AUTHORS.md">list of contributors</a> on GitHub.</p>
-
-    <h3>Acknowledgements</h3>
-
-    <b>Bruno Pramont</b> Collectd code. <br />
-    <b>Dennis de Houx</b> Application monitors for PowerDNS, Shoutcast, NTPD (Client, Server). <br />
-    <b>Erik Bosrup</b> Overlib Library. <br />
-    <b>Jonathan De Graeve</b> SNMP code improvements. <br />
-    <b>Mark James</b> Silk Iconset. <br />
-    <b>Observium</b> Codebase for fork. <br />
-
-  </div>
 </div>
 
 <script>

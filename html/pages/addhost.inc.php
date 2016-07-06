@@ -27,6 +27,20 @@ if ($_POST['hostname']) {
         else {
             $transport = 'udp';
         }
+  
+        if ($_POST['sn']) {
+            $sn = mres($_POST['sn']);
+        }
+        else {
+            $sn = '';
+        }
+
+        if ($_POST['description']) {
+            $description = mres($_POST['description']);
+        }
+        else {
+            $description = '';
+        }
 
         if ($_POST['snmpver'] === 'v2c' or $_POST['snmpver'] === 'v1') {
             if ($_POST['community']) {
@@ -110,7 +124,7 @@ if ($_POST['hostname']) {
         }
 
         $result = addHost($hostname, $snmpver, $port, $transport, 0, $poller_group, $force_add, 
-              $port_assoc_mode,$transport_type,$transport_port,$transport_username,$transport_password,$transport_enablepassword,$accountName,$dms_location);
+              $port_assoc_mode,$transport_type,$transport_port,$transport_username,$transport_password,$transport_enablepassword,$accountName,$dms_location,$sn,$description);
          
         if ($result) {
             print_message("Device added ($result)");
@@ -188,6 +202,18 @@ foreach (get_port_assoc_modes() as $mode) {
         </select>
       </div>
     </div>
+   <div class="form-group">
+     <label for="description" class="col-sm-3 control-label">Description</label>
+     <div class="col-sm-9">
+     <input type="text" id="description" name="description" class="form-control input-sm" placeholder="device description">
+     </div>
+   </div>
+   <div class="form-group">
+     <label for="sn" class="col-sm-3 control-label">Serial Number</label>
+     <div class="col-sm-9">
+     <input type="text" id="sn" name="sn" class="form-control input-sm" placeholder="serial number">
+     </div>
+   </div>
     <div id="snmpv1_2">
       <div class="form-group">
         <div class="col-sm-12 alert alert-info">

@@ -19,6 +19,15 @@ if ($_POST['editing']) {
             $override_sysLocation = 0;
         }
 
+       if (isset($_POST['descr']) && $_POST['descr'] != $device["description"]) {
+          dbUpdate(array('description'=> $_POST['descr']), 'devices', '`device_id`=?' ,array($device['device_id']));
+        }
+
+       if (isset($_POST['sn']) && $_POST['sn'] != $device["sn"]) {
+          dbUpdate(array('sn'=> $_POST['sn']), 'devices', '`device_id`=?' ,array($device['device_id']));
+        }   
+
+
         dbUpdate(array('override_sysLocation'=>$override_sysLocation), 'devices', '`device_id`=?' ,array($device['device_id']));
 
         if (isset($override_sysLocation_string)) {
@@ -86,7 +95,9 @@ elseif ($update_message) {
     <div class="form-group">
         <label for="descr" class="col-sm-2 control-label">Description:</label>
         <div class="col-sm-6">
-            <textarea id="descr" name="descr" class="form-control"><?php echo($device['purpose']); ?></textarea>
+            <?php
+               echo  "<input type='text' id='descr' name='descr' class='form-control' value={$device['description']}></input>";
+            ?>
         </div>
     </div>
     <div class="form-group">
@@ -111,6 +122,14 @@ elseif ($update_message) {
             </select>
        </div>
     </div>
+   <div class="form-group">
+     <label for="sn" class="col-sm-2 control-label">Serial Number</label>
+     <div class="col-sm-6">
+        <?php 
+           echo "<input type='text' id='sn' name='sn' class='form-control' value={$device['sn']}></input>";
+        ?>
+     </div>
+   </div>
 <div class="form-group">
     <label for="sysLocation" class="col-sm-2 control-label">Override sysLocation:</label>
     <div class="col-sm-6">

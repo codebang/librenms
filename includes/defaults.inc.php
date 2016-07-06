@@ -36,7 +36,7 @@ function set_debug($debug) {
 }//end set_debug()
 
 // Default directories
-$config['project_name'] = 'LibreNMS';
+$config['project_name'] = 'libreNMS';
 $config['project_id']   = strtolower($config['project_name']);
 
 $config['temp_dir']    = '/tmp';
