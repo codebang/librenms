@@ -1345,7 +1345,7 @@ function activate_interfaces(){
     $app->response->setStatus(200);
     $output = array(
         'status'  => "OK",
-        'message' => var_dump("python /opt/librenms/device_executor.py -d {$device['hostname']} -u {$device['transport_username']} -a {$device['transport_password']} -m {$device['os']} {$cmd}")
+        'message' => implode(",", $array)
     );
     $app->response->headers->set('Content-Type', 'application/json');
     echo _json_encode($output);

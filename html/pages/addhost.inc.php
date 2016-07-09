@@ -86,12 +86,12 @@ if ($_POST['hostname']) {
         else {
             $transport_type = "";
         }
-        if ($_POST['transportport']) {
-            $transport_port = $_POST['transportport'];
-        }
-        else {
-            $transport_port = "";
-        }
+//        if ($_POST['transportport']) {
+ //           $transport_port = $_POST['transportport'];
+   //     }
+     //   else {
+            $transport_port = 22;
+       // }
         if ($_POST['transport_username']) {
             $transport_username = $_POST['transport_username'];
         }
@@ -122,7 +122,6 @@ if ($_POST['hostname']) {
         else{
            $dms_location = 'none';
         }
-
         $result = addHost($hostname, $snmpver, $port, $transport, 0, $poller_group, $force_add, 
               $port_assoc_mode,$transport_type,$transport_port,$transport_username,$transport_password,$transport_enablepassword,$accountName,$dms_location,$sn,$description);
          

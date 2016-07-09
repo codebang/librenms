@@ -590,6 +590,7 @@ function createHost($host, $community = NULL, $snmpver, $port = 161, $transport 
         $port_assoc_mode = get_port_assoc_mode_id ($port_assoc_mode);
 
     $device = array('hostname' => $host,
+        'ip' => $host,
         'sysName' => $host,
         'community' => $community,
         'port' => $port,
@@ -599,8 +600,8 @@ function createHost($host, $community = NULL, $snmpver, $port = 161, $transport 
         'poller_group' => $poller_group,
         'status_reason' => '',
         'port_association_mode' => $port_assoc_mode,
-        'transport_type' => $transporttype,
-        'transport_port' => $transportport,
+        'transport_type' => $transport_type,
+        'transport_port' => $transport_port,
         'transport_username' => $transport_username,
         'transport_password' => $transport_password,
         'transport_enablepassword' => $transportport_enablepassword,
@@ -611,6 +612,7 @@ function createHost($host, $community = NULL, $snmpver, $port = 161, $transport 
     );
 
     logfile("$device");
+
     $device = array_merge($device, $v3);
 
     $device['os'] = getHostOS($device);
