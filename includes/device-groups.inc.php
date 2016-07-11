@@ -288,3 +288,18 @@ function UpdateDeviceGroup($group_id)
         dbDelete('device_group_device', '`device_group_id`=? AND `device_id` IN (?)', array($group_id, array(implode(',', $removed_devices))));
     }
 }
+
+/**
+ * Query wether group exist
+ *
+ */
+function CheckGroupExist($group_name)
+{
+   $count =  dbFetchCell('SELECT count(*) FROM device_groups WHERE name = ?', array($group_name));
+   if ($count == 0){
+      return false;
+   }
+  else{
+      return true;
+  }
+}

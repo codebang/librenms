@@ -41,6 +41,8 @@ else {
   $panes['misc']     = 'Misc';
 
   $panes['component'] = 'Components';
+  
+  $panes['topology'] = 'Topology Setting';
 
   print_optionbar_start();
 

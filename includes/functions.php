@@ -611,7 +611,6 @@ function createHost($host, $community = NULL, $snmpver, $port = 161, $transport 
         'description' => $description
     );
 
-    logfile("$device");
 
     $device = array_merge($device, $v3);
 
@@ -622,6 +621,7 @@ function createHost($host, $community = NULL, $snmpver, $port = 161, $transport 
         if (host_exists($host, $snmphost) === false) {
             $device_id = dbInsert($device, 'devices');
             if ($device_id) {
+                handle_device_group($device["account_name"]);
                 notify_dso_for_create_switch($device);
                 return($device_id);
             }
@@ -678,6 +678,19 @@ function notify_dso_for_create_switch($device){
 
 }
 
+function handle_device_group($device_account_name){
+   if ($device_account_name == 'none'){
+     $group_name = 'Default';
+   }
+   else{
+     $group_name = $device_account_name;
+   }
+   if (!CheckGroupExist($group_name)){
+        $desc = "group by accountname";
+        $pattern = "%devices.account_name = '${group_name}'";
+        AddDeviceGroup($group_name,$desc,$pattern); 
+   }
+}
 
 
 function isDomainResolves($domain) {

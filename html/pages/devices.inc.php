@@ -76,7 +76,6 @@ foreach ($menu_options as $option => $text) {
     }
 ?>
     </select>
-
 <?php
 
 if (isset($vars['searchbar']) && $vars['searchbar'] == "hide") {
@@ -213,7 +212,6 @@ if($format == "graph") {
     }
 
     $query .= " ORDER BY hostname";
-
     $row = 1;
     foreach (dbFetchRows($query, $sql_param) as $device) {
         if (is_integer($row/2)) {
@@ -224,7 +222,7 @@ if($format == "graph") {
         }
 
         if (device_permitted($device['device_id'])) {
-            if (!$location_filter || $device['location'] == $location_filter) {
+           if (!$location_filter || $device['dms_location'] == $location_filter) {
                 $graph_type = "device_".$subformat;
 
                 if ($_SESSION['widescreen']) {
@@ -268,12 +266,13 @@ else {
             <thead>
                 <tr>
                     <th data-column-id="status" data-searchable="false" data-formatter="status">Status</th>
-                    <th data-column-id="icon" data-sortable="false" data-searchable="false">Vendor</th>
                     <th data-column-id="hostname" data-order="asc">Device</th>
+                    <th data-column-id="account_name">Account</th>
+                    <th data-column-id="dms_location">Location</th>
+                    <th data-column-id="icon" data-sortable="false" data-searchable="false">Vendor</th>`
                     <th data-column-id="ports" data-sortable="false" data-searchable="false"></th>
                     <th data-column-id="hardware">Platform</th>
                     <th data-column-id="os">Operating System</th>
-                    <th data-column-id="uptime">Uptime/Location</th>
                     <th data-column-id="actions" data-sortable="false" data-searchable="false">Actions</th>
                 </tr>
             </thead>
@@ -312,84 +311,6 @@ else {
 ?>
                 "</select>"+
                 "</div>"+
-                "<div class=\"form-group\">"+
-                "<select name='version' id='version' class=\"form-control input-sm\">"+
-                "<option value=''>All Versions</option>"+
-<?php
-
-    if (is_admin() === TRUE || is_read() === TRUE) {
-        $sql = "SELECT `version` FROM `devices` AS D WHERE 1 GROUP BY `version` ORDER BY `version`";
-    }
-    else {
-        $sql = "SELECT `version` FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` GROUP BY `version` ORDER BY `version`";
-        $param[] = $_SESSION['user_id'];
-    }
-    foreach (dbFetch($sql,$param) as $data) {
-        if ($data['version']) {
-            $tmp_version = clean_bootgrid($data['version']);
-            echo('"<option value=\"'.$tmp_version.'\""+');
-            if ($tmp_version == $vars['version']) {
-                echo('" selected "+');
-            }
-            echo('">'.$tmp_version.'</option>"+');
-        }
-    }
-?>
-                "</select>"+
-                "</div>"+
-                "<div class=\"form-group\">"+
-                "<select name=\"hardware\" id=\"hardware\" class=\"form-control input-sm\">"+
-                 "<option value=\"\">All Platforms</option>"+
-<?php
-
-    if (is_admin() === TRUE || is_read() === TRUE) {
-        $sql = "SELECT `hardware` FROM `devices` AS D WHERE 1 GROUP BY `hardware` ORDER BY `hardware`";
-    }
-    else {
-        $sql = "SELECT `hardware` FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` GROUP BY `hardware` ORDER BY `hardware`";
-        $param[] = $_SESSION['user_id'];
-    }
-    foreach (dbFetch($sql,$param) as $data) {
-        if ($data['hardware']) {
-            $tmp_hardware = clean_bootgrid($data['hardware']);
-            echo('"<option value=\"'.$tmp_hardware.'\""+');
-            if ($tmp_hardware == $vars['hardware']) {
-                echo('" selected"+');
-            }
-            echo('">'.$tmp_hardware.'</option>"+');
-        }
-    }
-
-?>
-                "</select>"+
-                "</div>"+
-                "<div class=\"form-group\">"+
-                "<select name=\"features\" id=\"features\" class=\"form-control input-sm\">"+
-                "<option value=\"\">All Featuresets</option>"+
-<?php
-
-    if (is_admin() === TRUE || is_read() === TRUE) {
-        $sql = "SELECT `features` FROM `devices` AS D WHERE 1 GROUP BY `features` ORDER BY `features`";
-    }
-    else {
-        $sql = "SELECT `features` FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` GROUP BY `features` ORDER BY `features`";
-        $param[] = $_SESSION['user_id'];
-    }
-
-    foreach (dbFetch($sql,$param) as $data) {
-        if ($data['features']) {
-            $tmp_features = clean_bootgrid($data['features']);
-            echo('"<option value=\"'.$tmp_features.'\""+');
-            if ($tmp_features == $vars['features']) {
-                echo('" selected"+');
-            }
-            echo('">'.$tmp_features.'</option>"+');
-        }
-    }
-
-?>
-                   "</select>"+
-                   "</div></span><span class=\"pull-left\">"+
                    "<div class=\"form-group\">"+
                    "<select name=\"location\" id=\"location\" class=\"form-control input-sm\">"+
                    "<option value=\"\">All Locations</option>"+
@@ -397,7 +318,7 @@ else {
 <?php
 // fix me function?
 
-    foreach (getlocations() as $location) {
+    foreach (getdmslocations() as $location) {
         if ($location) {
             $location = clean_bootgrid($location);
             echo('"<option value=\"'.$location.'\""+');
@@ -410,31 +331,6 @@ else {
 ?>
                     "</select>"+
                     "</div>"+
-                    "<div class=\"form-group\">"+
-                    "<select name=\"type\" id=\"type\" class=\"form-control input-sm\">"+
-                    "<option value=\"\">All Device Types</option>"+
-<?php
-
-    if (is_admin() === TRUE || is_read() === TRUE) {
-        $sql = "SELECT `type` FROM `devices` AS D WHERE 1 GROUP BY `type` ORDER BY `type`";
-    }
-    else {
-        $sql = "SELECT `type` FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` GROUP BY `type` ORDER BY `type`";
-        $param[] = $_SESSION['user_id'];
-    }
-    foreach (dbFetch($sql,$param) as $data) {
-        if ($data['type']) {
-            echo('"<option value=\"'.$data['type'].'\""+');
-            if ($data['type'] == $vars['type']) {
-                echo('" selected"+');
-            }
-            echo('">'.ucfirst($data['type']).'</option>"+');
-        }
-    }
-
-?>
-                      "</select>"+
-                      "</div>"+
                       "<button type=\"submit\" class=\"btn btn-default input-sm\">Search</button>"+
                       "<div class=\"form-group\">"+
                       "<a href=\"<?php echo(generate_url($vars)); ?>\" title=\"Update the browser URL to reflect the search criteria.\" >&nbsp;Update URL</a> |"+
