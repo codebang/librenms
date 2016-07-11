@@ -367,7 +367,8 @@ $row = 1;
 list($format, $subformat) = explode("_", $vars['format']);
 
 $ports = dbFetchRows($query, $param);
-for($ports as $port){
+
+foreach($ports as $port){
   $port['room'] = 'test';
 }
 switch ($vars['sort']) {
