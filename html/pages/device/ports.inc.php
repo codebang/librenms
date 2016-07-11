@@ -132,6 +132,7 @@ else {
     <th width="75">Speed</th>
     <th width="100">Media</th>
     <th width="100">Mac Address</th>
+    <th width="75">Room</th>
     <th width="375"></th>
   </tr>
 <?php
@@ -160,6 +161,7 @@ else {
     }
 
     foreach ($ports as $port) {
+        $port['root'] = 'test';
         include 'includes/print-interface.inc.php';
         $i++;
     }

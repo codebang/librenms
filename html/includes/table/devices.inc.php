@@ -78,7 +78,7 @@ if (!empty($_POST['location']) && $_POST['location'] == 'Unset') {
 }
 
 if (!empty($_POST['location'])) {
-    $sql    .= " AND `location` = ?";
+    $sql    .= " AND `dms_location` = ?";
     $param[] = $_POST['location'];
 }
 
@@ -228,7 +228,8 @@ foreach (dbFetchRows($sql, $param) as $device) {
         'ports'    => $col_port,
         'hardware' => $platform,
         'os'       => $os,
-        'uptime'   => $uptime,
+        'dms_location' => $device['dms_location'],
+        'account_name' => $device['account_name'],
         'actions'  => $actions,
     );
 }//end foreach

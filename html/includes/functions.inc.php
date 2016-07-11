@@ -806,6 +806,24 @@ function getlocations() {
 }//end getlocations()
 
 
+function getdmslocations(){
+  $locations = array();
+  $rows = dbFetchRows('SELECT D.device_id,dms_location FROM devices AS D GROUP BY dms_location ORDER BY dms_location');
+
+  foreach ($rows as $row) {
+        // Only add it as a location if it wasn't overridden (and not already there)
+        if ($row['dms_location'] != '') {
+            if (!in_array($row['dms_location'], $locations)) {
+                $locations[] = $row['dms_location'];
+            }
+        }
+    }
+
+    sort($locations);
+    return $locations;
+}
+
+
 function foldersize($path) {
     $total_size  = 0;
     $files       = scandir($path);

@@ -367,7 +367,9 @@ $row = 1;
 list($format, $subformat) = explode("_", $vars['format']);
 
 $ports = dbFetchRows($query, $param);
-
+for($ports as $port){
+  $port['room'] = 'test';
+}
 switch ($vars['sort']) {
     case 'traffic':
         $ports = array_sort($ports, 'ifOctets_rate', SORT_DESC);

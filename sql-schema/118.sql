@@ -9,4 +9,3 @@ ALTER TABLE `devices` ADD `description` varchar(255) CHARACTER SET latin1  DEFAU
 ALTER TABLE `devices` ADD `sn` varchar(255) CHARACTER SET latin1  DEFAULT NULL;
 ALTER TABLE `devices` ADD `account_name` varchar(255) CHARACTER SET latin1  DEFAULT NULL;
 ALTER TABLE `devices` ADD `dms_location` varchar(255) CHARACTER SET latin1 DEFAULT NULL;
-
