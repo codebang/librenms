@@ -5,14 +5,13 @@ import os
 import re
 
 from netmiko import ConnectHandler
-
 from optparse import OptionParser
+
+from util import config
 
 parser = OptionParser()
 parser.add_option('-d','--device',dest='manageip',help='switch manage ip')
 parser.add_option('-t','--mactable',dest='mactable',help='mactable')
-parser.add_option('-s','--redishost',dest='redis_host',help='redis-server')
-parser.add_option('-p','--redisport',dest='redis_port',help='redis-server')
 
 (options, args) = parser.parse_args()
 
@@ -48,12 +47,6 @@ if __name__ == '__main__':
     if not options.mactable:
       parser.error('switch mactable is required')
 
-    if not options.redis_host:
-      parser.error('redis host ip is required')
- 
-    if not options.redis_port:
-      parser.error('redis port is required')
- 
     data_lines = options.mactable.splitlines()
     entries = []
     if len(data_lines) < 2:
@@ -71,7 +64,9 @@ if __name__ == '__main__':
           data_line = filter(None,data_line.split(' '))
           entries.append(MacEntry.fromData(data_line))
 
-    redis_host = redis.Redis(host=options.redis_host,port=options.redis_port)
+    redis_server = config["redis_server"]
+    redis_port = config["redis_port"]
+    redis_host = redis.Redis(host=redis_server,port=redis_port)
     for entry in entries:
           map = {}
           map['vlan_id'] = entry.vlan_id

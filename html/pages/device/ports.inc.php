@@ -160,8 +160,8 @@ else {
         break;
     }
 
-    foreach ($ports as $port) {
-        $port['root'] = 'test';
+    foreach ($ports as &$port) {
+        $port['room'] = 'test';
         include 'includes/print-interface.inc.php';
         $i++;
     }
