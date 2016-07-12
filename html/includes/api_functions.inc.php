@@ -1329,24 +1329,23 @@ function activate_interfaces(){
     $app  = \Slim\Slim::getInstance();
     $data = json_decode(file_get_contents('php://input'), true);
     // Default status & code to error and change it if we need to.
-    $status = 'error';
-    $code   = 500;
     $management_ip = $data['managementIp'];
-    $ports = $data['ports'];
-    $cmd = '"system-view;';
-    foreach ($ports as $sw => $port_list){
-        foreach($port_list as $port){
-              $cmd = $cmd."interface {$port};undo shutdown;quit;";
-           }
-    }
-    $cmd = $cmd."save;Y;\n".'"';
     $device = dbFetchRow('SELECT * FROM `devices` WHERE `hostname` = ?', array($data['managementIp']));
-    exec("python /opt/librenms/device_executor.py -d {$device['hostname']} -u {$device['transport_username']} -a {$device['transport_password']} -m {$device['os']} {$cmd}",$array,$ret);    
-    $app->response->setStatus(200);
-    $output = array(
-        'status'  => "OK",
-        'message' => implode(",", $array)
-    );
+    $ret_arr = port_enable($device['hostname'],$device['transport_username'],$device['transport_password'],$device['os'],$data['ports']);
+    if ($ret_arr['result'] == 'SUCCESS'){
+        $app->response->setStatus(200);
+        $output = array(
+            'status'  => "OK",
+            'message' => $ret_arr['desc']
+        );
+    }
+    else{
+        $app->response->setStatus(500);
+        $output = array(
+            'status'  => "Fail",
+            'message' => $ret_arr['desc']
+    }
+
     $app->response->headers->set('Content-Type', 'application/json');
     echo _json_encode($output);
 

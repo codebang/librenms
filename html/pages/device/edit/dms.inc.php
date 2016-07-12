@@ -22,20 +22,13 @@ if ($_POST['editing']) {
        else{
             $rows_updated = dbUpdate($update_item, 'devices', '`device_id` = ?', array($device['device_id']));
             if ($rows_updated > 0) {
-                $update_message = $rows_updated.' Device record updated.';
-                   $install_dir = $config['install_dir'];
-                   $dso_url = $config['dso_url'];
-                   $redis_server = $config['redis_server'];
-                   $redis_port = $config['redis_port'];
-                   logfile('start to notify dso to setup the relationship between device and switch');
-                   logfile("$cmd");
-                   $cmd = "python {$install_dir}/python_scripts/dms_manager.py -d {$dso_url} -r {$redis_server} updateswitch_dms {$device['hostname']} {$accountName} {$dms_location} ";
-                   exec($cmd,$ret_desc,$ret_code);
-                   if ($ret_code < 0){
-                      print_error('failed to notify dso.');
+                   $update_message = $rows_updated.' Device record updated.';
+                   $ret_arr = update_switch_dms($device['hostname'],$accountname,$dms_location);
+                   if ($ret_arr["result"] == "FAILURE"){
+                      print_error($ret_arr["desc"]);
                    }
                    else{
-                     print_message($ret_desc[0]);
+                     print_message($ret_arr["desc"]);
                    }
                    $updated        = 1;
             }
@@ -78,8 +71,8 @@ if ($_POST['editing']) {
                       <?php
                            $an_db = $device['account_name'];
                            $loc_db = $device['dms_location'];
-                           $cmd="python ".$config["install_dir"]."/python_scripts/dms_manager.py -d {$config['dso_url']} -r {$config['redis_server']} listaccountnames";
-                           exec($cmd,$accounts,$ret);
+                           $ret_arr = list_accountname();
+                           $accounts = $ret_arr['desc'];
                            array_unshift($accounts,"none");
                            foreach ($accounts as $account){
                                if ($an_db == $account){
@@ -99,8 +92,8 @@ if ($_POST['editing']) {
                   <select name="dms_location" id="location" class="form-control input-sm">
                       <?php
                            $loc_db = $device['dms_location'];
-                           $cmd="python ".$config["install_dir"]."/python_scripts/dms_manager.py -d {$config['dso_url']} -r {$config['redis_server']} listlocations";
-                           exec($cmd,$locations,$ret);
+                           $ret_arr = list_location();
+                           $locations = $ret_arr['desc'];
                            array_unshift($locations,"none");
                            foreach ($locations as $location){
                                if ($loc_db == $location){

@@ -350,8 +350,8 @@ if ($config['distributed_poller'] === true) {
               <div class="col-sm-9">
                   <select name="accountName" id="accountName" class="form-control input-sm">
                       <?php
-                           $cmd="python ".$config["install_dir"]."/python_scripts/dms_manager.py -d {$config['dso_url']} -r {$config['redis_server']} listaccountnames";
-                           exec($cmd,$accounts,$ret);
+                           $ret_arr = list_accountname();
+                           $accounts = $ret_arr['desc'];
                            array_unshift($accounts,"none");
                            foreach ($accounts as $account){
                                echo "<option value={$account}>{$account}</option>";
@@ -365,8 +365,8 @@ if ($config['distributed_poller'] === true) {
               <div class="col-sm-9">
                   <select name="dms_location" id="location" class="form-control input-sm">
                       <?php
-                           $cmd="python ".$config["install_dir"]."/python_scripts/dms_manager.py -d {$config['dso_url']} -r {$config['redis_server']} listlocations";
-                           exec($cmd,$locations,$ret);
+                           $ret_arr = list_location();
+                           $locations = $ret_arr['desc'];
                            array_unshift($locations,"none");
                            foreach ($locations as $location){
                                echo "<option value={$location}>{$location}</option>";

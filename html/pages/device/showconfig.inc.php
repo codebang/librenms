@@ -30,8 +30,8 @@ if (is_admin()) {
             }
             echo '</div>';
         }
-    $cmd = '"display current"';
-    exec("python /opt/librenms/device_executor.py -d {$device['hostname']} -u {$device['transport_username']} -a {$device['transport_password']} -m {$device['os']} {$cmd}",$array,$ret);
+    $ret_arr = show_config($device['hostname'],$device['transport_username'],$device['transport_password'],$device['os']);
+    $array = $ret_arr['desc'];
     $text =  implode("\r\n",$array);
     if (!empty($text)) {
         // if (isset($previous_config)) {
