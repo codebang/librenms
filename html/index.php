@@ -165,6 +165,7 @@ else {
   <script src="js/jquery.bootgrid.min.js"></script>
   <script src="js/handlebars.min.js"></script>
   <script src="js/pace.min.js"></script>
+  <script src="js/d3.3.5.10.js"></script>
     <?php
         if ($config['enable_lazy_load'] === true) {
     ?>

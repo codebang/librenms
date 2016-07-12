@@ -76,6 +76,9 @@ if ($_SESSION['userlevel'] >= '10') {
                <li>
                     <a href="<?php echo(generate_url(array('page'=>'map'))); ?>"><i class="fa fa-desktop fa-fw fa-lg"></i> Network</a>
                </li>
+               <li>
+                   <a href="<?php echo(generate_url(array('page'=>'account-map'))); ?>"><i class="fa fa-building-o fa-fw fa-lg"></i> Account Topology</a>
+               </li>
                 <?php
 
                     require_once '../includes/device-groups.inc.php';
