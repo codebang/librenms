@@ -37,6 +37,10 @@ $pagetitle[] = 'Account Topology';
         height: 80px;
     }
 
+    image.accountnode:hover {
+        cursor: pointer;
+    }
+
     image.buildingnode {
         width: 80px;
         height: 80px;
@@ -45,6 +49,10 @@ $pagetitle[] = 'Account Topology';
     image.switchnode {
         width: 40px;
         height: 40px;
+    }
+
+    image.switchnode:hover {
+        cursor: pointer;
     }
 
 </style>
@@ -198,7 +206,7 @@ $pagetitle[] = 'Account Topology';
                     d3.mytimer = setTimeout(function() {
                         $(location).attr('href', d.link);
                         window.location = d.link;
-                    }, 500);
+                    }, 200);
                 }
             });
 
