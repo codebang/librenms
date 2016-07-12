@@ -29,6 +29,12 @@ $config['user'] = 'librenms';
 ### and that your web server has permission to talk to rrdcached.
 #$config['rrdcached']    = "unix:/var/run/rrdcached.sock";
 
+$config['redis_server'] = '10.74.113.133';
+$config['redis_port'] =  6379;
+$config['dso_url'] = 'http://10.74.113.56:8282/dso/sa';
+$config['kafka_brokers'] = '172.16.2.171:9092';
+$config['kafka_alert_topic'] = 'dms.alarm.vm';
+
 ### Default community
 $config['snmp']['community'] = array("public");
 

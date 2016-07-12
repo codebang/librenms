@@ -369,7 +369,7 @@ list($format, $subformat) = explode("_", $vars['format']);
 $ports = dbFetchRows($query, $param);
 
 foreach($ports as &$port){
-  $port['room'] = 'test';
+  $port['workstation'] = 'test';
 }
 switch ($vars['sort']) {
     case 'traffic':

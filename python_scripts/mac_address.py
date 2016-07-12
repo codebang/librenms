@@ -4,10 +4,12 @@ import time
 import os
 import re
 
+
 from netmiko import ConnectHandler
 from optparse import OptionParser
 
 from util import config
+from uitl import sendalarm
 
 parser = OptionParser()
 parser.add_option('-d','--device',dest='manageip',help='switch manage ip')

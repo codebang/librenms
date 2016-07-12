@@ -229,7 +229,6 @@ foreach (dbFetchRows($sql, $param) as $device) {
         'hardware' => $platform,
         'os'       => $os,
         'dms_location' => $device['dms_location'],
-        'account_name' => $device['account_name'],
         'actions'  => $actions,
     );
 }//end foreach

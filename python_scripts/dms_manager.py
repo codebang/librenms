@@ -4,6 +4,8 @@ import requests
 import redis
 from util import config
 from util import logger
+from util import sendalarm
+
 
 dso_url = config['dso_url']
 redis_host = config['redis_server']

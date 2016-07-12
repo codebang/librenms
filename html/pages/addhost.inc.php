@@ -110,12 +110,7 @@ if ($_POST['hostname']) {
         else {
             $transport_enablepassword = "";
         }
-        if ($_POST['accountName']){
-            $accountName = $_POST['accountName'];
-        }
-        else{
-           $accountName = 'none';
-        }
+
         if ($_POST['dms_location']){
            $dms_location = $_POST['dms_location'];
         }
@@ -123,7 +118,7 @@ if ($_POST['hostname']) {
            $dms_location = 'none';
         }
         $result = addHost($hostname, $snmpver, $port, $transport, 0, $poller_group, $force_add, 
-              $port_assoc_mode,$transport_type,$transport_port,$transport_username,$transport_password,$transport_enablepassword,$accountName,$dms_location,$sn,$description);
+              $port_assoc_mode,$transport_type,$transport_port,$transport_username,$transport_password,$transport_enablepassword,$dms_location,$sn,$description);
          
         if ($result) {
             print_message("Device added ($result)");
@@ -343,21 +338,6 @@ if ($config['distributed_poller'] === true) {
           <div class='form-group'>
               <div class="col-sm-12 alert alert-info">
                   <label class="control-label text-left input-sm">DMS Configuration(optional)</label>
-              </div>
-          </div>
-          <div class="form-group">
-              <label for="accountName" class="col-sm-3 control-label">Account Name</label>
-              <div class="col-sm-9">
-                  <select name="accountName" id="accountName" class="form-control input-sm">
-                      <?php
-                           $ret_arr = list_accountname();
-                           $accounts = $ret_arr['desc'];
-                           array_unshift($accounts,"none");
-                           foreach ($accounts as $account){
-                               echo "<option value={$account}>{$account}</option>";
-                           }
-                      ?>
-                  </select>
               </div>
           </div>
           <div class="form-group">

@@ -80,7 +80,7 @@ $pagetitle[] = 'Account Topology';
         .append("svg:g")
         .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
 
-    d3.json("account_inv.json", function(json) {
+    d3.json("api/v0/topology", function(json) {
         root = json;
         root.x0 = h / 2;
         root.y0 = 0;

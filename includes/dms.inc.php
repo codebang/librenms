@@ -54,9 +54,12 @@ function list_location(){
   return  _exec_python_with_ret("dms_manager",$args);
 }
 
+function getWorkStationFromPort($switch_manageip,$port){
+}
+
 
 function _exec_python_with_ret($script,$args){
-   $install_dir = $config['install_dir']
+   $install_dir = $config['install_dir'];
    $cmd = "python ".$install_dir."/python_scripts/{$script}.py {$args}";
    exec($cmd,$ret_desc,$ret_code);
    if ($ret_code < 0){
@@ -67,7 +70,8 @@ function _exec_python_with_ret($script,$args){
    }
    return array("result" => $result,"desc" =>$ret_desc);
 }
->
+
+?>
 
 
 

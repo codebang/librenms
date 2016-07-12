@@ -1344,9 +1344,83 @@ function activate_interfaces(){
         $output = array(
             'status'  => "Fail",
             'message' => $ret_arr['desc']
+       );
     }
 
     $app->response->headers->set('Content-Type', 'application/json');
     echo _json_encode($output);
-
 }
+
+function get_topology(){
+   $inv = array();
+   $inv['name'] = "WJ";
+   $inv['type'] = "root";
+   $locations = array();
+   $sql = 'SELECT device_id,dms_location,description,hostname FROM devices';
+   $params = array();
+   $devices = dbFetchRows($sql,$params);
+   $device_group = array();
+   foreach($devices as $device){
+      if (in_array($device['dms_location'],$device_group)){
+          $group = $device_group[$device['dms_location']];
+          $group[] = $device;
+      }
+      else{
+          $group = array();
+          $group[] = $device;
+          $device_group[$device['dms_location']] = $group;
+      }
+   }
+   foreach($device_group as $lc => $devices){
+      $location = array();
+      $location['name'] = $lc;
+      $location['type'] = 'building';
+      $location['link'] = 'devices/group=3';
+      $switches = array();
+      foreach($devices as $device){
+          $switch = array();
+          if ($device['description'] == 'none'){
+             $switch['name'] = $device['hostname'];
+          }
+          else{
+             $switch['name'] = $device['description'];
+          }
+          $switch['size'] = 1;
+          $switch['type'] = 'switch';
+          $switch['link'] = '/device/device='."{$device['device_id']}";
+          $port_binding = array();
+          $sql = 'select ifName from ports where device_id =? and ifName not like "NULL%" and ifName not like "InLoopBack%" and ifName not like "Vlan-interface%"';
+          $params = array($device['device_id']);
+          $ports = dbFetchRows($sql,$params);
+          $switch['total'] = count($ports); 
+          $used = 0;
+          foreach($ports as $port){
+             $port_room = array();
+             #$ws = getWorkStationFromPort($device['hostname'],$port);
+             $ws = '101';
+             if ($ws == "UnFound"){
+               $port_room['type'] = 'port';
+               $port_room['name'] = $port['ifName'];
+             }
+             else{
+               $port_room['type'] = 'workstation';
+               $port_room['name'] = $ws;
+               $used = $used + 1;
+             }
+             $port_room['link'] = 'ports/';
+             array_push($port_binding,$port_room);
+          }
+         $switch['used'] = $used;
+         $switch['children'] = $port_binding;
+         array_push($switches,$switch);  
+      }
+      $location['children'] = $switches;
+      array_push($locations,$location);
+   }
+   $inv['children'] = $locations; 
+   $app  = \Slim\Slim::getInstance();
+   $app->response->setStatus(200);
+   $app->response->headers->set('Content-Type', 'application/json');
+   echo _json_encode($inv);
+}
+

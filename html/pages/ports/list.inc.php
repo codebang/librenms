@@ -8,7 +8,7 @@ echo '<tr class="tablehead">';
 $cols = array(
     'device'      => 'Device',
     'port'        => 'Port',
-    'room'        => 'Room',
+    'workstation'        => 'WorkStation',
     'speed'       => 'Speed',
     'traffic_in'  => 'Down',
     'traffic_out' => 'Up',
@@ -64,7 +64,7 @@ foreach ($ports as $port) {
         echo "<tr class='ports'>
             <td width=200 class=list-bold>".generate_device_link($port, shorthost($port['hostname'], '20'))."</td>
             <td width=150 class=list-bold><a class='".$ifclass."'href='".generate_port_url($port)."'>".fixIfName($port['label'])." $error_img</td>
-            <td width=100 class=green>{$port['room']}</td>
+            <td width=100 class=green>{$port['workstation']}</td>
             <td width=110 >$speed</td>
             <td width=100 class=green>".$port['in_rate'].'</td>
             <td width=100 class=blue>'.$port['out_rate']."</td>

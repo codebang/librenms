@@ -267,7 +267,6 @@ else {
                 <tr>
                     <th data-column-id="status" data-searchable="false" data-formatter="status">Status</th>
                     <th data-column-id="hostname" data-order="asc">Device</th>
-                    <th data-column-id="account_name">Account</th>
                     <th data-column-id="dms_location">Location</th>
                     <th data-column-id="icon" data-sortable="false" data-searchable="false">Vendor</th>`
                     <th data-column-id="ports" data-sortable="false" data-searchable="false"></th>

@@ -31,6 +31,7 @@ include_once($config['install_dir'] . "/includes/snmp.inc.php");
 include_once($config['install_dir'] . "/includes/services.inc.php");
 include_once($config['install_dir'] . "/includes/console_colour.php");
 include_once($config['install_dir'] . "/includes/snmp.inc.php");
+include_once($config['install_dir'] . "/includes/dms.inc.php");
 
 $console_color = new Console_Color2();
 
@@ -211,6 +212,7 @@ function delete_device($id) {
     $ret = '';
 
     $host = dbFetchCell("SELECT hostname FROM devices WHERE device_id = ?", array($id));
+    $dms_location = dbFetchCell("SELECT dms_location FROM devices WHERE device_id = ?", array($id));
     if( empty($host) ) {
         return "No such host.";
     }
@@ -243,6 +245,7 @@ function delete_device($id) {
         $ret .= "Could not remove files:\n$ex\n";
     }
 
+    delete_device_group($id,$dms_location);
     $ret .= "Removed device $host\n";
     log_event("Device $host has been removed", 0, 'system');
     return $ret;
@@ -275,15 +278,15 @@ function addHost($host, $snmpver, $port = '161', $transport = 'udp', $quiet = '0
                 if (empty($snmpver)) {
                     // Try SNMPv2c
                     $snmpver = 'v2c';
-                    $ret = addHost($host, $snmpver, $port, $transport, $quiet, $poller_group, $force_add, $port_assoc_mode,$transport_type,$transport_port,$transport_username,$transport_password,$transport_enablepassword,$accountName,$dms_location,$sn,$description);
+                    $ret = addHost($host, $snmpver, $port, $transport, $quiet, $poller_group, $force_add, $port_assoc_mode,$transport_type,$transport_port,$transport_username,$transport_password,$transport_enablepassword,$dms_location,$sn,$description);
                     if (!$ret) {
                         //Try SNMPv3
                         $snmpver = 'v3';
-                        $ret = addHost($host, $snmpver, $port, $transport, $quiet, $poller_group, $force_add, $port_assoc_mode,$transport_type,$transport_port,$transport_username,$transport_password,$transport_enablepassword,$accountName,$dms_location,$sn,$description);
+                        $ret = addHost($host, $snmpver, $port, $transport, $quiet, $poller_group, $force_add, $port_assoc_mode,$transport_type,$transport_port,$transport_username,$transport_password,$transport_enablepassword,$dms_location,$sn,$description);
                         if (!$ret) {
                             // Try SNMPv1
                             $snmpver = 'v1';
-                            return addHost($host, $snmpver, $port, $transport, $quiet, $poller_group, $force_add, $port_assoc_mode,$transport_type,$transport_port,$transport_username,$transport_password,$transport_enablepassword,$accountName,$dms_location,$sn,$description);
+                            return addHost($host, $snmpver, $port, $transport, $quiet, $poller_group, $force_add, $port_assoc_mode,$transport_type,$transport_port,$transport_username,$transport_password,$transport_enablepassword,$dms_location,$sn,$description);
                         }
                         else {
                             return $ret;
@@ -302,7 +305,7 @@ function addHost($host, $snmpver, $port = '161', $transport = 'udp', $quiet = '0
                         if ($force_add == 1 || isSNMPable($device)) {
                             $snmphost = snmp_get($device, "sysName.0", "-Oqv", "SNMPv2-MIB");
                             if (empty($snmphost) or ($snmphost == $host || $hostshort = $host)) {
-                                $device_id = createHost ($host, NULL, $snmpver, $port, $transport, $v3, $poller_group, $port_assoc_mode, $snmphost,$transport_type,$transport_port,$transport_username,$transport_password,$transport_enablepassword,$accountName,$dms_location,$sn,$description);
+                                $device_id = createHost ($host, NULL, $snmpver, $port, $transport, $v3, $poller_group, $port_assoc_mode, $snmphost,$transport_type,$transport_port,$transport_username,$transport_password,$transport_enablepassword,$dms_location,$sn,$description);
                                 return $device_id;
                             }
                             else {
@@ -328,7 +331,7 @@ function addHost($host, $snmpver, $port = '161', $transport = 'udp', $quiet = '0
                         if ($force_add == 1 || isSNMPable($device)) {
                             $snmphost = snmp_get($device, "sysName.0", "-Oqv", "SNMPv2-MIB");
                             if (empty($snmphost) || ($snmphost && ($snmphost == $host || $hostshort = $host))) {
-                                $device_id = createHost ($host, $community, $snmpver, $port, $transport,array(),$poller_group, $port_assoc_mode, $snmphost,$transport_type,$transport_port,$transport_username,$transport_password,$transport_enablepassword,$accountName,$dms_location,$sn,$description);
+                                $device_id = createHost ($host, $community, $snmpver, $port, $transport,array(),$poller_group, $port_assoc_mode, $snmphost,$transport_type,$transport_port,$transport_username,$transport_password,$transport_enablepassword,$dms_location,$sn,$description);
                                 return $device_id;
                             }
                             else {
@@ -578,7 +581,7 @@ function getpollergroup($poller_group='0') {
 }
 
 function createHost($host, $community = NULL, $snmpver, $port = 161, $transport = 'udp', $v3 = array(), $poller_group='0', $port_assoc_mode = 'ifIndex', $snmphost,
-    $transport_type,$transport_port,$transport_username,$transport_password,$transport_enablepassword,$accountName,$dms_location,$sn,$description) {
+    $transport_type,$transport_port,$transport_username,$transport_password,$transport_enablepassword,$dms_location,$sn,$description) {
     global $config;
     $host = trim(strtolower($host));
 
@@ -605,7 +608,6 @@ function createHost($host, $community = NULL, $snmpver, $port = 161, $transport 
         'transport_username' => $transport_username,
         'transport_password' => $transport_password,
         'transport_enablepassword' => $transportport_enablepassword,
-        'account_name' => $accountName,
         'dms_location' => $dms_location,
         'sn' => $sn,
         'description' => $description
@@ -621,7 +623,7 @@ function createHost($host, $community = NULL, $snmpver, $port = 161, $transport 
         if (host_exists($host, $snmphost) === false) {
             $device_id = dbInsert($device, 'devices');
             if ($device_id) {
-                handle_device_group($device["account_name"]);
+                handle_device_group($device["dms_location"]);
                 notify_dso_for_create_switch($device);
                 return($device_id);
             }
@@ -674,18 +676,33 @@ function notify_dso_for_create_switch($device){
 
 }
 
-function handle_device_group($device_account_name){
-   if ($device_account_name == 'none'){
+function handle_device_group($dms_location){
+   if ($dms_location == 'none'){
      $group_name = 'Default';
    }
    else{
-     $group_name = $device_account_name;
+     $group_name = $dms_location;
    }
    if (!CheckGroupExist($group_name)){
-        $desc = "group by accountname";
-        $pattern = "%devices.account_name = '${group_name}'";
+        $desc = "group by location";
+        $pattern = "%devices.dms_location = '{$dms_location}'";
         AddDeviceGroup($group_name,$desc,$pattern); 
    }
+}
+
+function delete_device_group($device_id,$dms_location){
+  if($dms_location == 'none'){
+     $group_name = 'Default';
+  }
+  else{
+    $group_name = $dms_location;
+  }
+  $sql = "select device_id from devices where dms_location = ?";
+  $param = array($dms_location);
+  $devices = dbFetchRows($sql,$param);
+  if (count($devices) == 1 and $devices[0]['device_id'] == $device_id){
+     dbDelete('device_groups','name=?',array($dms_location));
+  }
 }
 
 

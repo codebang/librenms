@@ -2,14 +2,9 @@
 
 if ($_POST['editing']) {
     if ($_SESSION['userlevel'] > '7') {
-        $accountName = mres($_POST['accountName']);
         $dms_location = mres($_POST['dms_location']);
-
         $update_item = array();
 
-        if($accountName != $device['account_name']){
-          $update_item['account_name']=$accountName;
-        }
         if($dms_location != $device['dms_location']){
            $update_item['dms_location']=$dms_location;
         }
@@ -23,7 +18,7 @@ if ($_POST['editing']) {
             $rows_updated = dbUpdate($update_item, 'devices', '`device_id` = ?', array($device['device_id']));
             if ($rows_updated > 0) {
                    $update_message = $rows_updated.' Device record updated.';
-                   $ret_arr = update_switch_dms($device['hostname'],$accountname,$dms_location);
+                   $ret_arr = update_switch_dms($device['hostname'],$dms_location);
                    if ($ret_arr["result"] == "FAILURE"){
                       print_error($ret_arr["desc"]);
                    }
@@ -59,36 +54,9 @@ if ($_POST['editing']) {
 ?>
     <form name="form1" method="post" action="" class="form-horizontal" role="form">
           <input type=hidden name='editing' value='yes'>
-          <div class='form-group'>
-              <div class="col-sm-12 alert alert-info">
-                  <label class="control-label text-left input-sm">DMS Configuration(optional)</label>
-              </div>
-          </div>
           <div class="form-group">
-              <label for="accountName" class="col-sm-3 control-label">Account Name</label>
-              <div class="col-sm-9">
-                  <select name="accountName" id="accountName" class="form-control input-sm">
-                      <?php
-                           $an_db = $device['account_name'];
-                           $loc_db = $device['dms_location'];
-                           $ret_arr = list_accountname();
-                           $accounts = $ret_arr['desc'];
-                           array_unshift($accounts,"none");
-                           foreach ($accounts as $account){
-                               if ($an_db == $account){
-                                  echo "<option value={$account} selected>{$account}</option>";
-                               }
-                               else{
-                                  echo "<option value={$account}>{$account}</option>";
-                               }
-                           }
-                      ?>
-                  </select>
-              </div>
-          </div>
-          <div class="form-group">
-              <label for="location" class="col-sm-3 control-label">location</label>
-              <div class="col-sm-9">
+              <label for="location" class="col-sm-1 control-label">Location</label>
+              <div class="col-sm-6">
                   <select name="dms_location" id="location" class="form-control input-sm">
                       <?php
                            $loc_db = $device['dms_location'];
@@ -108,6 +76,6 @@ if ($_POST['editing']) {
               </div>
           </div>
           <div class="col-sm-3">
-               <button type="submit" name="Submit"  class="btn btn-default"><i class="fa fa-check"></i> Save</button>
+               <button type="submit" name="Submit"  class="btn btn-default"><i class="fa fa-check"></i>Save</button>
           </div>
     </form>

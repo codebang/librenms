@@ -68,6 +68,7 @@ $app->group(
                 // api/v0/devices
                 $app->post('/devices', 'authToken', 'add_device')->name('add_device');
                 $app->post('/interfaces/status', 'activate_interfaces')->name('activate_interfaces');
+                $app->get('/topology','get_topology')->name('get_topology');
                 // api/v0/devices (json data needs to be passed)
                 $app->group(
                     '/devicegroups',

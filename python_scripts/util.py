@@ -3,7 +3,8 @@ import subprocess
 import logging
 import sys
 import json
-
+import time
+from kafka import KafkaClient,SimpleProducer
 
 ob_install_dir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 config_file = ob_install_dir + '/config.php'
@@ -45,3 +46,27 @@ fh.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 fh.setFormatter(formatter)
 logger.addHandler(fh)
+
+
+
+def sendalarm(accountId,host,item,severity,message):
+    msg={}
+    msg["@timestamp"] = int(round(time.time() * 1000))
+    msg["accountId"] = accountId
+    msg["host"] = host
+    msg["item"] = item
+    msg["severity"] = severity
+    msg["message"] = message
+    transport_string = json.dumps(msg)
+    broker_list = config['kafka_brokers']
+    alarm_topic = config['kafka_alert_topic']
+    kafka = KafkaClient(broker_list)
+    producer = SimpleProducer(kafka)
+    try:
+      producer.send_message(b"%s" % transport_string, alarm_topic)
+    except Exception,exec:
+      logger.error(exec.message)
+    finally:
+      kafka.close()
+      
+  
