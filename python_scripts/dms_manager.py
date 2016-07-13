@@ -13,7 +13,14 @@ redis_port = config['redis_port']
 redis_server = redis.Redis(host=redis_host,port=redis_port)
 
 
-def listaccountnames():
+def redis_context(func):
+   def inner_func(*args,**kwargs):
+       redis_server = redis.Redis(host=redis_host,port=redis_port)
+       func(args,kwargs,redis_server = redis_server)
+   return inner_func
+
+@redis_context
+def listaccountnames(redis_server = ):
   keys = redis_server.hkeys('accounts')
   for key in keys:
     print key
@@ -22,11 +29,7 @@ def listlocations():
    keys = redis_server.hvals('locations')
    for key in keys:
      print key
-def getaccountidbyname(name):
-   print name
 
-def getlocationidbyname(name):
-   print name
 
 def createswitch(switch_json):
    logger.info('start to create switch:(%s)' % switch_json)
@@ -66,7 +69,18 @@ def updateswitch(switch_ip,account_name,dms_location):
    switch_json = json.dumps(switch)
    logger.info('request:%s' % switch_json)
    requests.post('%s/switch' % dso_url,data=switch_json,headers=headers)
-   
+
+
+
+def getworkstationfromport(switchip,port_name):
+  key = "switch_" + switchip
+  json_attrib = redis_server.hget(key,port_name) 
+  if json_attrib:
+     swtich = json.loads(json_attrib)
+     return switch['workstation']
+  else:
+     return "none"
+
 
 if __name__ == '__main__':
   func_string = args.pop(0)

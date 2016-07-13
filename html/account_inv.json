@@ -1,48 +1,167 @@
-{
- "name": "WJ",
- "type": "root",
- "children": [
-  {
-   "name": "account A",
-   "type": "account",
-   "link": "link1",
-   "children": [
-    {
-     "name": "Building A",
-     "type": "building",
-     "children": [
-      {"name": "Floor-1 Switch", "size": 1, "link": "link1"},
-      {"name": "Floor-2 Switch", "size": 1, "link": "link1"},
-      {"name": "Floor-3 Switch", "size": 1, "link": "link1"},
-      {"name": "Floor-4 Switch", "size": 1, "link": "link1"}
-     ]
-    },
-    {
-     "name": "Building B",
-     "type": "building",
-     "children": [
-      {
-       "name": "Floor-8 Switch", "size": 1, "link": "link1"
-      },
-      {
-       "name": "Floor-9 Switch", "size": 1, "link": "link1"
-      }
-     ]
-    }
-   ]
-  },
-  {
-   "name": "Default Account",
-   "type": "account",
-   "link": "link1",
-   "children": [
-    {
-     "name": "H3C Switch A", "size": 1, "link": "link1"
-    },
-    {
-     "name": "H3C Switch B", "size": 1, "link": "link1"
-    }
-   ]
-  }
- ]
+me": "WJ",
+    "type": "root",
+    "children": [
+        {
+            "name": "中国上海上海徐汇漕河泾中心漕河泾",
+            "type": "building",
+            "link": "",
+            "children": [
+                {
+                    "name": "",
+                    "size": 1,
+                    "type": "switch",
+                    "link": "",
+                    "total": 29,
+                    "used": 29,
+                    "children": [
+                        {
+                            "type": "workstation",
+                            "name": "101",
+                            "link": "ports/"
+                        },
+                        {
+                            "type": "workstation",
+                            "name": "101",
+                            "link": "ports/"
+                        },
+                        {
+                            "type": "workstation",
+                            "name": "101",
+                            "link": "ports/"
+                        },
+                        {
+                            "type": "workstation",
+                            "name": "101",
+                            "link": "ports/"
+                        },
+                        {
+                            "type": "workstation",
+                            "name": "101",
+                            "link": "ports/"
+                        },
+                        {
+                            "type": "workstation",
+                            "name": "101",
+                            "link": "ports/"
+                        },
+                        {
+                            "type": "workstation",
+                            "name": "101",
+                            "link": "ports/"
+                        },
+                        {
+                            "type": "workstation",
+                            "name": "101",
+                            "link": "ports/"
+                        },
+                        {
+                            "type": "workstation",
+                            "name": "101",
+                            "link": "ports/"
+                        },
+                        {
+                            "type": "workstation",
+                            "name": "101",
+                            "link": "ports/"
+                        },
+                        {
+                            "type": "workstation",
+                            "name": "101",
+                            "link": "ports/"
+                        },
+                        {
+                            "type": "workstation",
+                            "name": "101",
+                            "link": "ports/"
+                        },
+                        {
+                            "type": "workstation",
+                            "name": "101",
+                            "link": "ports/"
+                        },
+                        {
+                            "type": "workstation",
+                            "name": "101",
+                            "link": "ports/"
+                        },
+                        {
+                            "type": "workstation",
+                            "name": "101",
+                            "link": "ports/"
+                        },
+                        {
+                            "type": "workstation",
+                            "name": "101",
+                            "link": "ports/"
+                        },
+                        {
+                            "type": "workstation",
+                            "name": "101",
+                            "link": "ports/"
+                        },
+                        {
+                            "type": "workstation",
+                            "name": "101",
+                            "link": "ports/"
+                        },
+                        {
+                            "type": "workstation",
+                            "name": "101",
+                            "link": "ports/"
+                        },
+                        {
+                            "type": "workstation",
+                            "name": "101",
+                            "link": "ports/"
+                        },
+                        {
+                            "type": "workstation",
+                            "name": "101",
+                            "link": "ports/"
+                        },
+                        {
+                            "type": "workstation",
+                            "name": "101",
+                            "link": "ports/"
+                        },
+                        {
+                            "type": "workstation",
+                            "name": "101",
+                            "link": "ports/"
+                        },
+                        {
+                            "type": "workstation",
+                            "name": "101",
+                            "link": "ports/"
+                        },
+                        {
+                            "type": "workstation",
+                            "name": "101",
+                            "link": "ports/"
+                        },
+                        {
+                            "type": "workstation",
+                            "name": "101",
+                            "link": "ports/"
+                        },
+                        {
+                            "type": "workstation",
+                            "name": "101",
+                            "link": "ports/"
+                        },
+                        {
+                            "type": "workstation",
+                            "name": "101",
+                            "link": "ports/"
+                        },
+                        {
+                            "type": "workstation",
+                            "name": "101",
+                            "link": "ports/"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
 }

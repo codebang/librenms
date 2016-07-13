@@ -55,6 +55,20 @@ function list_location(){
 }
 
 function getWorkStationFromPort($switch_manageip,$port){
+  $args = "getworkstationfromport '{$port}'";
+  $ret_arr = _exec_python_with_ret("dms_manager",$args);
+  if ($ret_arr['result'] == "SUCCESS"){
+       $ws = $ret_arr['desc'];    
+       if ($ws == 'none'){
+          return 'UnFound';
+       }
+       else{
+          return $ws;
+       }
+  }
+  else{
+     return "UnFound";
+  }
 }
 
 

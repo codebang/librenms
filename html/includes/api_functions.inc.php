@@ -1396,8 +1396,7 @@ function get_topology(){
           $used = 0;
           foreach($ports as $port){
              $port_room = array();
-             #$ws = getWorkStationFromPort($device['hostname'],$port);
-             $ws = '101';
+             $ws = getWorkStationFromPort($device['hostname'],$port);
              if ($ws == "UnFound"){
                $port_room['type'] = 'port';
                $port_room['name'] = $port['ifName'];
