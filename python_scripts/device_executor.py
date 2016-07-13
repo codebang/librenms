@@ -3,7 +3,7 @@ from netmiko import ConnectHandler
 from netmiko.ssh_exception import NetMikoTimeoutException
 from util import config
 from util import logger
-from uitl import sendalarm
+from util import sendalarm
 
 mapping = {
     'comware':'huawei'

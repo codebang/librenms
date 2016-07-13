@@ -9,7 +9,7 @@ from netmiko import ConnectHandler
 from optparse import OptionParser
 
 from util import config
-from uitl import sendalarm
+from util import sendalarm
 
 parser = OptionParser()
 parser.add_option('-d','--device',dest='manageip',help='switch manage ip')
@@ -60,8 +60,6 @@ if __name__ == '__main__':
        elif pattern.match(data_line):
           matchObj = pattern.match(data_line)
           number = int(matchObj.group(1))
-          print number
-          print len(entries)
        else:
           data_line = filter(None,data_line.split(' '))
           entries.append(MacEntry.fromData(data_line))
@@ -79,3 +77,4 @@ if __name__ == '__main__':
           map['device'] = options.manageip
           redis_host.hset('mactable',entry.mac_addr,json.dumps(map)) 
 
+    print "Poll device mac successfully."

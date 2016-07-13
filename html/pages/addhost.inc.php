@@ -343,7 +343,7 @@ if ($config['distributed_poller'] === true) {
           <div class="form-group">
               <label for="location" class="col-sm-3 control-label">location</label>
               <div class="col-sm-9">
-                  <select name="dms_location" id="location" class="form-control input-sm">
+                  <select name="dms_location" id="dms_location" class="form-control input-sm">
                       <?php
                            $ret_arr = list_location();
                            $locations = $ret_arr['desc'];

@@ -252,7 +252,7 @@ function delete_device($id) {
 }
 
 function addHost($host, $snmpver, $port = '161', $transport = 'udp', $quiet = '0', $poller_group = '0', $force_add = '0', $port_assoc_mode = 'ifIndex',
-            $transport_type,$transport_port,$transport_username,$transport_password,$transport_enablepassword,$accountName='none',$dms_location='none',$sn = 'none', $description = 'none') {
+            $transport_type,$transport_port,$transport_username,$transport_password,$transport_enablepassword,$dms_location='none',$sn = 'none', $description = 'none') {
     global $config;
 
     list($hostshort) = explode(".", $host);
@@ -700,7 +700,7 @@ function delete_device_group($device_id,$dms_location){
   $sql = "select device_id from devices where dms_location = ?";
   $param = array($dms_location);
   $devices = dbFetchRows($sql,$param);
-  if (count($devices) == 1 and $devices[0]['device_id'] == $device_id){
+  if (count($devices) == 0){
      dbDelete('device_groups','name=?',array($dms_location));
   }
 }

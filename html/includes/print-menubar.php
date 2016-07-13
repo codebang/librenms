@@ -173,23 +173,6 @@ foreach (dbFetchRows($sql,$param) as $devtype) {
                 echo '</ul></li>';
             }
 if ($_SESSION['userlevel'] >= '10') {
-    if ($config['show_locations']) {
-        echo('
-            <li role="presentation" class="divider"></li>
-            <li class="dropdown-submenu">
-            <a href="#"><i class="fa fa-map-marker fa-fw fa-lg"></i> Locations</a>
-            <ul class="dropdown-menu scrollable-menu">
-            ');
-        if ($config['show_locations_dropdown']) {
-            foreach (getlocations() as $location) {
-                echo('            <li><a href="devices/location=' . urlencode($location) . '/"><i class="fa fa-building-o fa-fw fa-lg"></i> ' . $location . ' </a></li>');
-            }
-        }
-        echo('
-            </ul>
-            </li>
-            ');
-    }
     echo '
             <li role="presentation" class="divider"></li>';
     if (is_module_enabled('poller', 'mib')) {
@@ -197,10 +180,6 @@ if ($_SESSION['userlevel'] >= '10') {
             <li><a href='.generate_url(array('page'=>'mib_assoc')).'><i class="fa fa-file-text-o fa-fw fa-lg"></i> MIB associations</a></li>
             <li role="presentation" class="divider"></li>
          ';
-    }
-
-    if ($config['navbar']['manage_groups']['hide'] === 0) {
-        echo '<li><a href="'.generate_url(array('page'=>'device-groups')).'"><i class="fa fa-th fa-fw fa-lg"></i> Manage Groups</a></li>';
     }
 
      echo '

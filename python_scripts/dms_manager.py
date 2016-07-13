@@ -2,6 +2,7 @@ from optparse import OptionParser
 import sys
 import requests
 import redis
+import json
 from util import config
 from util import logger
 from util import sendalarm
@@ -10,22 +11,28 @@ from util import sendalarm
 dso_url = config['dso_url']
 redis_host = config['redis_server']
 redis_port = config['redis_port']
-redis_server = redis.Redis(host=redis_host,port=redis_port)
+
+
+parser = OptionParser()
+(options, args) = parser.parse_args()
 
 
 def redis_context(func):
    def inner_func(*args,**kwargs):
        redis_server = redis.Redis(host=redis_host,port=redis_port)
-       func(args,kwargs,redis_server = redis_server)
+       kwargs['redis_server'] = redis_server
+       func(*args,**kwargs)
    return inner_func
 
 @redis_context
-def listaccountnames(redis_server = ):
+def listaccountnames(redis_server):
   keys = redis_server.hkeys('accounts')
   for key in keys:
     print key
 
-def listlocations():
+ 
+@redis_context
+def listlocations(redis_server):
    keys = redis_server.hvals('locations')
    for key in keys:
      print key
@@ -43,7 +50,8 @@ def createswitch(switch_json):
       print 'fail to notify dso to create switch.'
       sys.exit(-1)
 
-def updateswitch(switch_ip,account_name,dms_location):
+@redis_context
+def updateswitch(switch_ip,account_name,dms_location,redis_server):
    logger.info('start to update switch(%s)' % switch_ip)
 
    headers = {'content-type': 'application/json'}
@@ -71,15 +79,15 @@ def updateswitch(switch_ip,account_name,dms_location):
    requests.post('%s/switch' % dso_url,data=switch_json,headers=headers)
 
 
-
-def getworkstationfromport(switchip,port_name):
+@redis_context
+def getworkstationfromport(switchip,port_name,redis_server):
   key = "switch_" + switchip
   json_attrib = redis_server.hget(key,port_name) 
   if json_attrib:
-     swtich = json.loads(json_attrib)
-     return switch['workstation']
+     switch = json.loads(json_attrib)
+     print switch['workstation']
   else:
-     return "none"
+     print "none"
 
 
 if __name__ == '__main__':

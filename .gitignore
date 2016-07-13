@@ -20,4 +20,4 @@ nbproject
 patches
 rrd
 .idea
-
+*.pyc

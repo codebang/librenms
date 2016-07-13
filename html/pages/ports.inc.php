@@ -369,7 +369,11 @@ list($format, $subformat) = explode("_", $vars['format']);
 $ports = dbFetchRows($query, $param);
 
 foreach($ports as &$port){
-  $port['workstation'] = 'test';
+  $ws = getWorkStationFromPort($port['hostname'],$port['ifName']);
+  if ($ws == 'UnFound'){
+       $ws = 'unbind';
+  }
+  $port['workstation'] = $ws;
 }
 switch ($vars['sort']) {
     case 'traffic':

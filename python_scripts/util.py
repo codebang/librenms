@@ -64,8 +64,8 @@ def sendalarm(accountId,host,item,severity,message):
     producer = SimpleProducer(kafka)
     try:
       producer.send_message(b"%s" % transport_string, alarm_topic)
-    except Exception,exec:
-      logger.error(exec.message)
+    except Exception as err:
+      logger.error(err.message)
     finally:
       kafka.close()
       

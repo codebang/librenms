@@ -1375,11 +1375,14 @@ function get_topology(){
       $location = array();
       $location['name'] = $lc;
       $location['type'] = 'building';
-      $location['link'] = 'devices/group=3';
+      $sql = 'select id from device_groups where name = ?';
+      $param = array($lc);
+      $group_id = dbFetchCell($sql,$param);
+      $location['link'] = "devices/group={$group_id}";
       $switches = array();
       foreach($devices as $device){
           $switch = array();
-          if ($device['description'] == 'none'){
+          if ($device['description'] == ''){
              $switch['name'] = $device['hostname'];
           }
           else{
@@ -1389,7 +1392,7 @@ function get_topology(){
           $switch['type'] = 'switch';
           $switch['link'] = '/device/device='."{$device['device_id']}";
           $port_binding = array();
-          $sql = 'select ifName from ports where device_id =? and ifName not like "NULL%" and ifName not like "InLoopBack%" and ifName not like "Vlan-interface%"';
+          $sql = 'select port_id,ifName from ports where device_id =? and ifName not like "NULL%" and ifName not like "InLoopBack%" and ifName not like "Vlan-interface%"';
           $params = array($device['device_id']);
           $ports = dbFetchRows($sql,$params);
           $switch['total'] = count($ports); 
@@ -1406,7 +1409,7 @@ function get_topology(){
                $port_room['name'] = $ws;
                $used = $used + 1;
              }
-             $port_room['link'] = 'ports/';
+             $port_room['link'] = "device/device={$device['device_id']}/tab=port/port={$port['port_id']}";
              array_push($port_binding,$port_room);
           }
          $switch['used'] = $used;
