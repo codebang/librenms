@@ -4,7 +4,7 @@ $pagetitle[] = 'Account Topology';
 
 ?>
 
-<h3> Account Topology </h3>
+<h3> Topology </h3>
 <hr>
 
 <style type="text/css">
@@ -46,6 +46,28 @@ $pagetitle[] = 'Account Topology';
         height: 80px;
     }
 
+    image.buildingnode:hover {
+        cursor: pointer;
+    }
+
+    image.workstationnode {
+        width: 30px;
+        height: 30px;
+    }
+
+    image.workstationnode:hover {
+        cursor: pointer;
+    }
+
+    image.workportnode {
+        width: 30px;
+        height: 30px;
+    }
+
+    image.workportnode:hover {
+        cursor: pointer;
+    }
+
     image.switchnode {
         width: 40px;
         height: 40px;
@@ -81,19 +103,24 @@ $pagetitle[] = 'Account Topology';
         .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
 
     d3.json("api/v0/topology", function(json) {
+//    d3.json("account_inv.json", function(json) {
         root = json;
         root.x0 = h / 2;
         root.y0 = 0;
 
         function toggleAll(d) {
+            console.debug(d);
             if (d.children) {
                 d.children.forEach(toggleAll);
-//                toggle(d);
+                if (d.type && d.type == "switch")
+                {
+                    toggle(d);
+                }
             }
         }
 
         // Show all nodes initially
-//        root.children.forEach(toggleAll);
+        root.children.forEach(toggleAll);
 
         update(root);
     });
@@ -118,18 +145,6 @@ $pagetitle[] = 'Account Topology';
                 return "translate(" + source.y0 + "," + source.x0 + ")";
             });
 
-        nodeEnter.append("svg:text")
-            .attr("x", function(d) {
-                return d.children || d._children ? 10 : 10;
-            })
-            .attr("y", function(d) {
-                return d.children || d._children ? 60 : 0;
-            })
-            .attr("dy", ".35em")
-            .attr("text-anchor", function(d) { return d.children || d._children ? "middle" : "start"; })
-            .text(function(d) { return d.name; })
-            .style("fill-opacity", 1e-6);
-
         nodeEnter.append("image")
             .attr("xlink:href", function(d) {
                 if (d.type)
@@ -141,6 +156,10 @@ $pagetitle[] = 'Account Topology';
                             return "images/account.png";
                         case "building":
                             return "images/building.png";
+                        case "workstation":
+                            return "images/workstation.png";
+                        case "port":
+                            return "images/workport.png";
                     }
                 }
                 return "images/switch.png";
@@ -155,6 +174,10 @@ $pagetitle[] = 'Account Topology';
                             return "accountnode";
                         case "building":
                             return "buildingnode";
+                        case "workstation":
+                            return "workstationnode";
+                        case "port":
+                            return "workportnode";
                     }
                 }
                 return "switchnode";
@@ -168,6 +191,10 @@ $pagetitle[] = 'Account Topology';
                         case "account":
                             return -20;
                         case "building":
+                            return -20;
+                        case "workstation":
+                            return -20;
+                        case "port":
                             return -20;
                     }
                 }
@@ -183,6 +210,8 @@ $pagetitle[] = 'Account Topology';
                             return -40;
                         case "building":
                             return -40;
+                        case "port":
+                            return -20;
                     }
                 }
                 return -20;
@@ -209,6 +238,33 @@ $pagetitle[] = 'Account Topology';
                     }, 200);
                 }
             });
+
+        nodeEnter.append("svg:text")
+            .attr("x", function(d) {
+                return d.children || d._children ? 10 : 10;
+            })
+            .attr("y", function(d) {
+                if (d.type && d.type == "root")
+                {
+                    return 40;
+                }
+                else {
+                    return d.children || d._children ? 60 : 0;
+                }
+            })
+            .attr("dy", ".35em")
+            .attr("text-anchor", function(d) { return d.children || d._children ? "middle" : "start"; })
+            .text(function(d) {
+                if (d.used && d.total)
+                {
+                    return d.name + "(" + d.used + "/" + d.total + ")";
+                }
+                else {
+                    return d.name;
+                }
+
+            })
+            .style("fill-opacity", 1e-6);
 
         // Transition nodes to their new position.
         var nodeUpdate = node.transition()

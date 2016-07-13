@@ -1,4 +1,4 @@
-me": "WJ",
+{"name": "WJ",
     "type": "root",
     "children": [
         {
@@ -7,12 +7,12 @@ me": "WJ",
             "link": "",
             "children": [
                 {
-                    "name": "",
+                    "name": "switch-1",
                     "size": 1,
                     "type": "switch",
                     "link": "",
                     "total": 29,
-                    "used": 29,
+                    "used": 27,
                     "children": [
                         {
                             "type": "workstation",
@@ -25,7 +25,7 @@ me": "WJ",
                             "link": "ports/"
                         },
                         {
-                            "type": "workstation",
+                            "type": "port",
                             "name": "101",
                             "link": "ports/"
                         },
@@ -45,7 +45,7 @@ me": "WJ",
                             "link": "ports/"
                         },
                         {
-                            "type": "workstation",
+                            "type": "port",
                             "name": "101",
                             "link": "ports/"
                         },
