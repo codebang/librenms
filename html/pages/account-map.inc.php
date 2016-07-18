@@ -372,7 +372,10 @@ $pagetitle[] = 'Account Topology';
                 }
 
             })
-            .style("fill-opacity", 1e-6);
+            .style("fill-opacity", 1e-6)
+            .each(function(d) {
+                d.textWidth = this.getBBox().width;
+            });
 
         nodeEnter.append("image")
             .attr("xlink:href", function(d) {
@@ -391,7 +394,7 @@ $pagetitle[] = 'Account Topology';
             .attr("x", function(d) {
                 if (d.type == "port")
                 {
-                    return 35;
+                    return d.textWidth + 10;
                 }
             })
             .attr("y", function(d) {
