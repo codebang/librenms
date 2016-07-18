@@ -267,7 +267,9 @@ else {
                 <tr>
                     <th data-column-id="status" data-searchable="false" data-formatter="status">Status</th>
                     <th data-column-id="hostname" data-order="asc">Device</th>
+<?php if($config['enable_location_feature']) { ?>
                     <th data-column-id="dms_location">Location</th>
+<?php } ?>
                     <th data-column-id="icon" data-sortable="false" data-searchable="false">Vendor</th>`
                     <th data-column-id="ports" data-sortable="false" data-searchable="false"></th>
                     <th data-column-id="hardware">Platform</th>

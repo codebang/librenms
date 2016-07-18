@@ -148,6 +148,7 @@ else {
   <link href="css/MarkerCluster.css" rel="stylesheet" type="text/css" />
   <link href="css/MarkerCluster.Default.css" rel="stylesheet" type="text/css" />
   <link href="css/leaflet.awesome-markers.css" rel="stylesheet" type="text/css" />
+  <link href="css/bootstrapValidator.min.css" rel="stylesheet" type="text/css" />
   <link href="<?php echo($config['stylesheet']);  ?>" rel="stylesheet" type="text/css" />
   <link href="css/<?php echo $config['site_style']; ?>.css" rel="stylesheet" type="text/css" />
   <script src="js/jquery.min.js"></script>
@@ -166,6 +167,8 @@ else {
   <script src="js/handlebars.min.js"></script>
   <script src="js/pace.min.js"></script>
   <script src="js/d3.3.5.10.js"></script>
+  <script src='js/bootstrapValidator.min.js'></script>
+  
     <?php
         if ($config['enable_lazy_load'] === true) {
     ?>

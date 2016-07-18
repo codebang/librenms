@@ -23,6 +23,14 @@ $type = strtolower($device['os']);
 $image = getImage($device);
 $host_id = dbFetchCell("SELECT `device_id` FROM `vminfo` WHERE `vmwVmDisplayName` = ? OR `vmwVmDisplayName` = ?", array($device['hostname'],$device['hostname'].'.'.$config['mydomain']));
 
+if($config['enable_location_feature']){
+   $groups = GetGroupsFromDevice($device['device_id']);
+   if (count(groups)>0){
+      $location_link = generate_link($device['dms_location'], array('page' => 'devices', 'group' => $groups[0]['id']));
+   }
+}else{
+   $location_link = generate_link($device['location'], array('page' => 'devices', 'location' => $device['location']));
+}
 echo '
             <tr bgcolor="'.$device_colour.'" class="alert '.$class.'">
              <td><span class="device_icon">'.$image.'</span></td>
@@ -35,7 +43,7 @@ if ($host_id > 0) {
              
 echo '
              <span style="font-size: 20px;">'.generate_device_link($device).'</span>
-             <br />'.generate_link($device['location'], array('page' => 'devices', 'location' => $device['location'])).'</td>
+             <br />'.$location_link.'</td>
              <td>';
 
 if (isset($config['os'][$device['os']]['over'])) {
@@ -62,13 +70,14 @@ $graph_array['height'] = '45';
 $graph_array['width']  = '150';
 $graph_array['bg']     = 'FFFFFF00';
 
+
 foreach ($graphs as $entry) {
     if ($entry['graph']) {
         $graph_array['type'] = $entry['graph'];
 
         echo "<div style='float: right; text-align: center; padding: 1px 5px; margin: 0 1px; ' class='rounded-5px'>";
         print_graph_popup($graph_array);
-        echo "<div style='font-weight: bold; font-size: 7pt; margin: -3px;'>".$entry['text'].'</div>';
+#        echo "<div style='font-weight: bold; font-size: 7pt; margin: -3px;'>".$entry['text'].'</div>';
         echo '</div>';
     }
 }

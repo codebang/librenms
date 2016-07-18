@@ -6,15 +6,20 @@
 echo '<tr class="tablehead">';
 
 $cols = array(
-    'device'      => 'Device',
-    'port'        => 'Port',
-    'workstation'        => 'WorkStation',
+    'device'   => 'Device', 'port' => 'Port');
+
+if ($config['enable_workspace_lookup']){
+    $cols["workstation"] =  'WorkStation';
+}
+
+$others = array(
     'speed'       => 'Speed',
     'traffic_in'  => 'Down',
     'traffic_out' => 'Up',
     'media'       => 'Media',
-    'descr'       => 'Description',
+    'descr'       => 'Description'
 );
+$cols = array_merge($cols,$others);
 
 foreach ($cols as $sort => $col) {
     if (isset($vars['sort']) && $vars['sort'] == $sort) {
@@ -64,8 +69,11 @@ foreach ($ports as $port) {
         echo "<tr class='ports'>
             <td width=200 class=list-bold>".generate_device_link($port, shorthost($port['hostname'], '20'))."</td>
             <td width=150 class=list-bold><a class='".$ifclass."'href='".generate_port_url($port)."'>".fixIfName($port['label'])." $error_img</td>
-            <td width=100 class=green>{$port['workstation']}</td>
-            <td width=110 >$speed</td>
+            ";
+        if($config["enable_workspace_lookup"]){
+           echo  "<td width=100 class=green>{$port['workstation']}</td>";
+        }
+           echo "<td width=110 >$speed</td>
             <td width=100 class=green>".$port['in_rate'].'</td>
             <td width=100 class=blue>'.$port['out_rate']."</td>
             <td width=150>$type</td>

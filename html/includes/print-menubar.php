@@ -57,48 +57,7 @@ else {
                     <li><a href="<?php echo(generate_url(array('page'=>'alerts'))); ?>"><i class="fa fa-bell fa-fw fa-lg"></i> Notifications</a></li>
                     <li><a href="<?php echo(generate_url(array('page'=>'alert-log'))); ?>"><i class="fa fa-th-list fa-fw fa-lg"></i> Historical Log</a></li>
                     <li><a href="<?php echo(generate_url(array('page'=>'alert-stats'))); ?>"><i class="fa fa-bar-chart fa-fw fa-lg"></i> Statistics</a></li>
-<?php
-if ($_SESSION['userlevel'] >= '10') {
-?>
-<li><a href="<?php echo(generate_url(array('page'=>'alert-rules'))); ?>"><i class="fa fa-tasks fa-fw fa-lg"></i> Rules</a></li>
-<li><a href="<?php echo(generate_url(array('page'=>'alert-schedule'))); ?>"><i class="fa fa-calendar fa-fw fa-lg"></i> Maintenance Windows</a></li>
-<li><a href="<?php echo(generate_url(array('page'=>'alert-map'))); ?>"><i class="fa fa-link fa-fw fa-lg"></i> Rule Mapping</a></li>
-<li><a href="<?php echo(generate_url(array('page'=>'templates'))); ?>"><i class="fa fa-sitemap fa-fw fa-lg"></i> Templates</a></li>
-<?php
-}
-?>
             </ul>
-          </li>
-          <li class="dropdown-submenu">
-           <a href="<?php echo(generate_url(array('page'=>'overview'))); ?>"><i class="fa fa-sitemap fa-fw fa-lg"></i> Maps</a>
-           <ul class="dropdown-menu">
-                <li><a href="<?php echo(generate_url(array('page'=>'availability-map'))); ?>"><i class="fa fa-arrow-circle-up fa-fw fa-lg"></i> Availability</a></li>
-               <li>
-                    <a href="<?php echo(generate_url(array('page'=>'map'))); ?>"><i class="fa fa-desktop fa-fw fa-lg"></i> Network</a>
-               </li>
-               <li>
-                   <a href="<?php echo(generate_url(array('page'=>'account-map'))); ?>"><i class="fa fa-building-o fa-fw fa-lg"></i> Account Topology</a>
-               </li>
-                <?php
-
-                    require_once '../includes/device-groups.inc.php';
-                    $devices_groups = GetDeviceGroups();
-                    if (count($devices_groups) > 0 ){
-                        echo '<li class="dropdown-submenu"><a href="#"><i class="fa fa-th fa-fw fa-lg"></i> Device Groups Maps</a><ul class="dropdown-menu scrollable-menu">';
-                        foreach( $devices_groups as $group ) {
-                            echo '<li><a href="'.generate_url(array('page'=>'map','group'=>$group['id'])).'" alt="'.$group['desc'].'"><i class="fa fa-th fa-fw fa-lg"></i> '.ucfirst($group['name']).'</a></li>';
-                        }
-                        unset($group);
-                        echo '</ul></li>';
-                    }
-                ?>
-           </ul>
-          </li>
-          <li class="dropdown-submenu">
-           <a href="<?php echo(generate_url(array('page'=>'overview'))); ?>"><i class="fa fa-wrench fa-fw fa-lg"></i> Tools</a>
-           <ul class="dropdown-menu scrollable-menu">
-           <li><a href="<?php echo(generate_url(array('page'=>'ripenccapi'))); ?>"><i class="fa fa-arrow-circle-up fa-fw fa-lg"></i> RIPE NCC API</a></li>
-           </ul>
           </li>
             <li role="presentation" class="divider"></li>
             <li><a href="<?php echo(generate_url(array('page'=>'eventlog'))); ?>"><i class="fa fa-book fa-fw fa-lg"></i> Eventlog</a></li>
@@ -126,9 +85,9 @@ if ( dbFetchCell("SELECT 1 from `packages` LIMIT 1") ) {
             <li role="presentation" class="divider"></li>
             <li role="presentation" class="dropdown-header"> Search</li>
             <li><a href="<?php echo(generate_url(array('page'=>'search','search'=>'ipv4'))); ?>"><i class="fa fa-search fa-fw fa-lg"></i> IPv4 Search</a></li>
-            <li><a href="<?php echo(generate_url(array('page'=>'search','search'=>'ipv6'))); ?>"><i class="fa fa-search fa-fw fa-lg"></i> IPv6 Search</a></li>
             <li><a href="<?php echo(generate_url(array('page'=>'search','search'=>'mac'))); ?>"><i class="fa fa-search fa-fw fa-lg"></i> MAC Search</a></li>
             <li><a href="<?php echo(generate_url(array('page'=>'search','search'=>'arp'))); ?>"><i class="fa fa-search fa-fw fa-lg"></i> ARP Tables</a></li>
+
 <?php
 if (is_module_enabled('poller', 'mib')) {
 ?>
@@ -164,6 +123,8 @@ foreach (dbFetchRows($sql,$param) as $devtype) {
 
         echo ('</ul>
              </li>');
+            require_once '../includes/device-groups.inc.php';
+            $devices_groups = GetDeviceGroups();
             if (count($devices_groups) > 0 ){
                 echo '<li class="dropdown-submenu"><a href="#"><i class="fa fa-th fa-fw fa-lg"></i> Device Groups</a><ul class="dropdown-menu scrollable-menu">';
                 foreach( $devices_groups as $group ) {
@@ -332,51 +293,15 @@ $menu_sensors = $used_sensors;
 
 ?>
 
+<!--
         <li class="dropdown">
           <a href="health/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-heartbeat fa-fw fa-lg fa-nav-icons hidden-md"></i> <span class="hidden-sm">Health</span></a>
           <ul class="dropdown-menu">
             <li><a href="health/metric=mempool/"><i class="fa fa-gears fa-fw fa-lg"></i> Memory</a></li>
             <li><a href="health/metric=processor/"><i class="fa fa-desktop fa-fw fa-lg"></i> Processor</a></li>
             <li><a href="health/metric=storage/"><i class="fa fa-database fa-fw fa-lg"></i> Storage</a></li>
-<?php
-if ($menu_sensors) {
-    $sep = 0;
-    echo('            <li role="presentation" class="divider"></li>');
-}
+-->
 
-$icons = array('fanspeed'=>'tachometer','humidity'=>'tint','temperature'=>'fire','current'=>'bolt','frequency'=>'line-chart','power'=>'power-off','voltage'=>'bolt','charge'=>'plus-square','dbm'=>'sun-o', 'load'=>'spinner','state'=>'bullseye','signal'=>'wifi');
-foreach (array('fanspeed','humidity','temperature','signal') as $item) {
-    if (isset($menu_sensors[$item])) {
-        echo('            <li><a href="health/metric='.$item.'/"><i class="fa fa-'.$icons[$item].' fa-fw fa-lg"></i> '.nicecase($item).'</a></li>');
-        unset($menu_sensors[$item]);$sep++;
-    }
-}
-
-if ($sep && array_keys($menu_sensors)) {
-    echo('          <li role="presentation" class="divider"></li>');
-    $sep = 0;
-}
-
-foreach (array('current','frequency','power','voltage') as $item) {
-    if (isset($menu_sensors[$item])) {
-        echo('            <li><a href="health/metric='.$item.'/"><i class="fa fa-'.$icons[$item].' fa-fw fa-lg"></i> '.nicecase($item).'</a></li>');
-        unset($menu_sensors[$item]);$sep++;
-    }
-}
-
-if ($sep && array_keys($menu_sensors)) {
-    echo('            <li role="presentation" class="divider"></li>');
-    $sep = 0;
-}
-
-foreach (array_keys($menu_sensors) as $item) {
-    echo('            <li><a href="health/metric='.$item.'/"><i class="fa fa-'.$icons[$item].' fa-fw fa-lg"></i> '.nicecase($item).'</a></li>');
-    unset($menu_sensors[$item]);$sep++;
-}
-
-?>
-          </ul>
-        </li>
 <?php
 
 $app_list = dbFetchRows("SELECT DISTINCT(`app_type`) AS `app_type` FROM `applications` ORDER BY `app_type`");
@@ -545,16 +470,21 @@ if ($_SESSION['authenticated']) {
         <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown" style="margin-left:5px"><i class="fa fa-cog fa-fw fa-lg fa-nav-icons"></i></a>
         <ul class="dropdown-menu">
           <li role="presentation" class="dropdown-header"> Settings</li>
+
 <?php
+/*
 if ($_SESSION['userlevel'] >= '10') {
     echo('<li><a href="settings/"><i class="fa fa-cogs fa-fw fa-lg"></i> Global Settings</a></li>');
 }
+*/
 
 ?>
           <li role="presentation" class="divider"></li>
-          <li role="presentation" class="dropdown-header"> Users</li>
+<!--          <li role="presentation" class="dropdown-header"> Users</li> -->
 
-<?php if ($_SESSION['userlevel'] >= '10') {
+<?php
+/*
+if ($_SESSION['userlevel'] >= '10') {
     if (auth_usermanagement()) {
         echo('
            <li><a href="adduser/"><i class="fa fa-user-plus fa-fw fa-lg"></i> Add User</a></li>
@@ -590,6 +520,7 @@ if ($_SESSION['userlevel'] >= '10') {
            </li>
            <li role="presentation" class="divider"></li>');
 }
+*/
 
 if ($_SESSION['authenticated']) {
     echo('

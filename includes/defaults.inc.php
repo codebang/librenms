@@ -137,7 +137,7 @@ $config['public_status'] = false;
 // Enable public accessable status page
 $config['old_graphs'] = 1;
 // RRDfiles from before the great rra reform. This is default for a while.
-$config['int_customers'] = 1;
+$config['int_customers'] = 0;
 // Enable Customer Port Parsing
 $config['customers_descr'] = 'cust';
 $config['transit_descr']   = '';
@@ -148,17 +148,17 @@ $config['core_descr'] = '';
 // Add custom core descriptions (can be an array)
 $config['custom_descr'] = '';
 // Add custom interface descriptions (can be an array)
-$config['int_transit'] = 1;
+$config['int_transit'] = 0;
 // Enable Transit Types
-$config['int_peering'] = 1;
+$config['int_peering'] = 0;
 // Enable Peering Types
-$config['int_core'] = 1;
+$config['int_core'] = 0;
 // Enable Core Port Types
 $config['int_l2tp'] = 0;
 // Enable L2TP Port Types
 $config['show_locations'] = 1;
 // Enable Locations on menu
-$config['show_locations_dropdown'] = 1;
+$config['show_locations_dropdown'] = 0;
 // Enable Locations dropdown on menu
 $config['show_services'] = 0;
 // Enable Services on menu
@@ -430,17 +430,17 @@ $config['overview_show_sysDescr'] = true;
 
 // Enable checking of version in discovery
 // Poller/Discovery Modules
-$config['enable_bgp'] = 1;
+$config['enable_bgp'] = 0;
 // Enable BGP session collection and display
 $config['enable_syslog'] = 0;
 // Enable Syslog
 $config['enable_inventory'] = 1;
 // Enable Inventory
-$config['enable_pseudowires'] = 1;
+$config['enable_pseudowires'] = 0;
 // Enable Pseudowires
-$config['enable_vrfs'] = 1;
+$config['enable_vrfs'] = 0;
 // Enable VRFs
-$config['enable_vrf_lite_cisco'] = 1;
+$config['enable_vrf_lite_cisco'] = 0;
 // Enable routes for VRF lite cisco
 $config['enable_printers'] = 0;
 // Enable Printer support
@@ -453,7 +453,7 @@ $config['enable_ports_etherlike'] = 0;
 // Enable Polling EtherLike-MIB (doubles interface processing time)
 $config['enable_ports_junoseatmvp'] = 0;
 // Enable JunOSe ATM VC Discovery/Poller
-$config['enable_ports_adsl'] = 1;
+$config['enable_ports_adsl'] = 0;
 // Enable ADSL-LINE-MIB
 $config['enable_ports_poe'] = 0;
 // Enable PoE stats collection
@@ -470,9 +470,9 @@ $config['billing']['base'] = 1000;
 // Set the base to divider bytes to kB, MB, GB ,... (1000|1024)
 // External Integration
 // $config['rancid_configs'][]             = '/var/lib/rancid/network/configs/';
-$config['rancid_ignorecomments'] = 0;
+//$config['rancid_ignorecomments'] = 0;
 // Ignore lines starting with #
-// $config['collectd_dir']                 = '/var/lib/collectd/rrd';
+// $config['collectd_dir']                 = '/var/lib/collectd/rrd0;
 // $config['smokeping']['dir']             = "/var/lib/smokeping/";
 $config['smokeping']['pings']             = 20;
 // $config['oxidized']['enabled']         = FALSE;//Set to TRUE

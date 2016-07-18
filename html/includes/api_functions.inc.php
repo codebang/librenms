@@ -1381,6 +1381,7 @@ function get_topology(){
       $location['link'] = "devices/group={$group_id}";
       $switches = array();
       foreach($devices as $device){
+          $cache = getworkstationfordevice($device['hostname']);
           $switch = array();
           if ($device['description'] == ''){
              $switch['name'] = $device['hostname'];
@@ -1399,15 +1400,14 @@ function get_topology(){
           $used = 0;
           foreach($ports as $port){
              $port_room = array();
-             $ws = getWorkStationFromPort($device['hostname'],$port);
-             if ($ws == "UnFound"){
-               $port_room['type'] = 'port';
-               $port_room['name'] = $port['ifName'];
-             }
-             else{
+             if (isset($cache[$port])){
                $port_room['type'] = 'workstation';
                $port_room['name'] = $ws;
                $used = $used + 1;
+             }
+             else{
+               $port_room['type'] = 'port';
+               $port_room['name'] = $port['ifName'];
              }
              $port_room['link'] = "device/device={$device['device_id']}/tab=port/port={$port['port_id']}";
              array_push($port_binding,$port_room);

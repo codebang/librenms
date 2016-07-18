@@ -2,7 +2,13 @@
 if ($_POST['editing']) {
     if ($_SESSION['userlevel'] > "7") {
         $updated = 0;
-
+      $update_item = array();
+      if($config['enable_location_feature']){
+        $dms_location = mres($_POST['dms_location']); 
+        if($dms_location != $device['dms_location']){
+           $update_item['dms_location']=$dms_location;
+        } 
+      }else{
         $override_sysLocation_bool = mres($_POST['override_sysLocation']);
         if (isset($_POST['sysLocation'])) {
             $override_sysLocation_string = $_POST['sysLocation'];
@@ -18,27 +24,26 @@ if ($_POST['editing']) {
         else {
             $override_sysLocation = 0;
         }
+        $update_item['override_sysLocation'] = $override_sysLocation;
 
-       if (isset($_POST['descr']) && $_POST['descr'] != $device["description"]) {
-          dbUpdate(array('description'=> $_POST['descr']), 'devices', '`device_id`=?' ,array($device['device_id']));
+        if (isset($override_sysLocation_string)) {
+            $update_item["location"] = $override_sysLocation_string;
+        }
+      }
+
+       if (isset($_POST['description']) && $_POST['description'] != $device["description"]) {
+          $update_item['description'] = $_POST['description'];
         }
 
        if (isset($_POST['sn']) && $_POST['sn'] != $device["sn"]) {
-          dbUpdate(array('sn'=> $_POST['sn']), 'devices', '`device_id`=?' ,array($device['device_id']));
+          $update_item['sn'] = $_POST['sn'];
         }   
 
-
-        dbUpdate(array('override_sysLocation'=>$override_sysLocation), 'devices', '`device_id`=?' ,array($device['device_id']));
-
-        if (isset($override_sysLocation_string)) {
-            dbUpdate(array('location'=>$override_sysLocation_string), 'devices', '`device_id`=?' ,array($device['device_id']));
-        }
-
+        $update_item['type'] = $_POST['type'];
         #FIXME needs more sanity checking! and better feedback
 
-        $param = array('purpose' => $_POST['descr'], 'type' => $_POST['type'], 'ignore' => $_POST['ignore'], 'disabled' => $_POST['disabled']);
 
-        $rows_updated = dbUpdate($param, 'devices', '`device_id` = ?', array($device['device_id']));
+        $rows_updated = dbUpdate($update_item, 'devices', '`device_id` = ?', array($device['device_id']));
 
         if ($rows_updated > 0 || $updated) {
             $update_message = "Device record updated.";
@@ -94,15 +99,15 @@ elseif ($update_message) {
 <input type=hidden name="editing" value="yes">
     <div class="form-group">
         <label for="descr" class="col-sm-2 control-label">Description:</label>
-        <div class="col-sm-6">
+        <div class="col-sm-5">
             <?php
-               echo  "<input type='text' id='descr' name='descr' class='form-control' value={$device['description']}></input>";
+               echo  "<input type='text' id='description' name='description' class='form-control' value={$device['description']}></input>";
             ?>
         </div>
     </div>
     <div class="form-group">
         <label for="type" class="col-sm-2 control-label">Type:</label>
-        <div class="col-sm-6">
+        <div class="col-sm-5">
             <select id="type" name="type" class="form-control">
                 <?php
                 $unknown = 1;
@@ -124,12 +129,13 @@ elseif ($update_message) {
     </div>
    <div class="form-group">
      <label for="sn" class="col-sm-2 control-label">Serial Number</label>
-     <div class="col-sm-6">
+     <div class="col-sm-5">
         <?php 
            echo "<input type='text' id='sn' name='sn' class='form-control' value={$device['sn']}></input>";
         ?>
      </div>
    </div>
+<?php if(!$config["enable_location_feature"]) { ?>
 <div class="form-group">
     <label for="sysLocation" class="col-sm-2 control-label">Override sysLocation:</label>
     <div class="col-sm-6">
@@ -138,13 +144,36 @@ elseif ($update_message) {
 </div>
 <div class="form-group">
     <div class="col-sm-2"></div>
-    <div class="col-sm-6">
+    <div class="col-sm-5">
       <input id="sysLocation" name="sysLocation" class="form-control" <?php if (!$override_sysLocation) echo(' disabled="1"'); ?> value="<?php echo($override_sysLocation_string); ?>" />
     </div>
 </div>
+<?php } else {?>
+<div class="form-group">
+     <label for="location" class="col-sm-2 control-label">Location</label>
+     <div class="col-sm-5">
+            <select name="dms_location" id="location" class="form-control input-sm">
+                 <?php
+                       $loc_db = $device['dms_location'];
+                       $ret_arr = list_location();
+                       $locations = $ret_arr['desc'];
+                       array_unshift($locations,$config['device_default_location']);
+                       foreach ($locations as $location){
+                           if ($loc_db == $location){
+                                echo "<option value={$location} selected>{$location}</option>";
+                           }
+                           else{
+                                 echo "<option value={$location}>{$location}</option>";
+                           }
+                       }
+                  ?>
+            </select>
+      </div>
+</div>
+<?php } ?>
 <div class="form-group">
     <label for="disabled" class="col-sm-2 control-label">Disable:</label>
-    <div class="col-sm-6">
+    <div class="col-sm-1">
       <input name="disabled" type="checkbox" id="disabled" value="1" <?php if ($device["disabled"]) echo("checked=checked"); ?> />
     </div>
 </div>
@@ -181,6 +210,24 @@ elseif ($update_message) {
             }
         });
     });
+   $(document).ready(function() {
+        $('#edit').bootstrapValidator({
+          feedbackIcons: {
+             valid: 'glyphicon glyphicon-ok',
+             invalid: 'glyphicon glyphicon-remove',
+             validating: 'glyphicon glyphicon-refresh'
+          },
+         fields: {
+            description: {
+                validators: {
+                    notEmpty: {
+                        message: 'Device Description is required.'
+                    }
+                }
+            }
+         }
+   }) 
+  });
 </script>
 <?php
 print_optionbar_start();
@@ -188,3 +235,4 @@ list($sizeondisk, $numrrds) = foldersize($config['rrd_dir']."/".$device['hostnam
 echo("Size on Disk: <b>" . formatStorage($sizeondisk) . "</b> in <b>" . $numrrds . " RRD files</b>.");
 print_optionbar_end();
 ?>
+

@@ -361,20 +361,40 @@ if ($ignore_filter == 0 && $disabled_filter == 0) {
 }
 
 $query = "SELECT * FROM `ports` AS I, `devices` AS D WHERE I.device_id = D.device_id ".$where." ".$query_sort;
-
 $row = 1;
 
 list($format, $subformat) = explode("_", $vars['format']);
 
 $ports = dbFetchRows($query, $param);
 
-foreach($ports as &$port){
-  $ws = getWorkStationFromPort($port['hostname'],$port['ifName']);
-  if ($ws == 'UnFound'){
-       $ws = 'unbind';
+if($config["enable_workspace_lookup"]){
+ $cache = array();
+ foreach($ports as &$port){
+   if ($port['ifName'] == NULL){
+      $key_string = 'ifDescr';
+   }
+   else{
+     $key_string = 'ifName';
+  }
+  $switch_ip = $port['hostname'];
+  if (isset($cache[$switch_ip])){
+     $port2ws = $cache[$switch_ip];
+  }
+  else{
+    $port2ws =  getWorkstationForDevice($switch_ip);
+    $cache[$switch_ip] = $port2ws;
+  }
+  
+  if (isset($port2ws[$port[$key_string]])){
+     $ws = $port2ws[$port[$key_string]];
+  }
+  else{
+    $ws = 'Unbind';
   }
   $port['workstation'] = $ws;
 }
+}
+
 switch ($vars['sort']) {
     case 'traffic':
         $ports = array_sort($ports, 'ifOctets_rate', SORT_DESC);

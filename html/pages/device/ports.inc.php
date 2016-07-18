@@ -132,7 +132,9 @@ else {
     <th width="75">Speed</th>
     <th width="100">Media</th>
     <th width="100">Mac Address</th>
-    <th width="75">Room</th>
+<?php if($config['enable_workspace_lookup']) { ?>
+    <th width="75">WorkStation</th>
+<?php } ?>
     <th width="375"></th>
   </tr>
 <?php
@@ -159,14 +161,31 @@ else {
         $ports = array_sort($ports, 'ifIndex', SORT_ASC);
         break;
     }
-
+ if($config["enable_workspace_lookup"]){
+    $cache = getWorkstationForDevice($device['hostname']);
     foreach ($ports as &$port) {
-        $port['room'] = 'test';
-        include 'includes/print-interface.inc.php';
-        $i++;
-    }
+          if ($port['ifName'] == NULL){
+             $key_string = 'ifDescr';
+           }
+          else{
+            $key_string = 'ifName';
+          }
 
-    echo '</table></div>';
+          if (isset($cache[$port[$key_string]])){
+              $ws = $cache[$port[$key_string]];
+          }
+          else{
+              $ws = 'Unbind';
+          }
+         $port['workstation'] = $ws;
+    }
+}
+foreach($ports as $port){
+    include 'includes/print-interface.inc.php';
+    $i++;
+}
+
+echo '</table></div>';
 }//end if
 
 $pagetitle[] = 'Ports';

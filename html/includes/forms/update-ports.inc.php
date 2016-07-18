@@ -62,6 +62,28 @@ foreach ($_POST as $key => $val) {
 
         $rows_updated += $n;
     }//end if
+    else if (strncmp($key, 'oldalloc_', 9) == 0) {
+        // Interface identifier passed as part of the field name
+        $port_id = intval(substr($key, 9));
+
+        $oldalloc = intval($val) ? 1 : 0;
+        $newalloc = $_POST['alloc_'.$port_id] ? 1 : 0;
+
+        // As checkboxes are not posted when unset - we effectively need to do a diff to work
+        // out a set->unset case.
+        if ($oldalloc == $newalloc) {
+            continue;
+        }
+
+        $n = dbUpdate(array('allocatable' => $newalloc), 'ports', '`device_id` = ? AND `port_id` = ?', array($device_id, $port_id));
+
+        if ($n < 0) {
+            $rows_updated = -1;
+            break;
+        }
+
+        $rows_updated += $n;
+    }
 }//end foreach
 
 if ($rows_updated > 0) {
