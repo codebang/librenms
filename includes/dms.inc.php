@@ -41,8 +41,8 @@ function create_switch_for_dms($request_body){
 
 
 
-function update_switch_dms($switch_ip,$accountname,$dms_location){
-   $args = "updateswitch {$swtich_ip} {$accountname} {$dms_location}" ;
+function update_switch_dms($switch_ip,$dms_location){
+   $args = "updateswitch {$switch_ip} {$dms_location}" ;
    return  _exec_python_with_ret("dms_manager",$args);
 } 
 
@@ -52,23 +52,25 @@ function list_location(){
   return  _exec_python_with_ret("dms_manager",$args);
 }
 
-function getWorkStationFromPort($switch_manageip,$port){
-  $args = "getworkstationfromport '{$switch_manageip}' '{$port}'";
+function getWorkstationForDevice($switch_manageip){
+  $args = "getworkstationfordevice '{$switch_manageip}'";
   $ret_arr = _exec_python_with_ret("dms_manager",$args);
   if ($ret_arr['result'] == "SUCCESS"){
        if (count($ret_arr)){
-          $ws = $ret_arr['desc'][0];    
-          if ($ws == 'none'){
-            return 'UnFound';
+          $ret = array();
+          $ws_json = $ret_arr['desc'][0];    
+          if ($ws_json != ''){
+             $ret = json_decode($ws_json,true);
           }
-          else{
-            return $ws;
-          }
+          return $ret;
+       }
+       else{
+          return array();
+       }
      
-        } 
-      else{
-          return "UnFound";
-      }
+  } 
+  else{
+      return array();
   }
 }
 
@@ -78,7 +80,7 @@ function _exec_python_with_ret($script,$args){
    $install_dir = $config['install_dir'];
    $cmd = "python ".$install_dir."/python_scripts/{$script}.py {$args}";
    exec($cmd,$ret_desc,$ret_code);
-   if ($ret_code < 0){
+   if ($ret_code == 255){
       $result = "FAILURE";
    }
    else{

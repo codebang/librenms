@@ -9,6 +9,17 @@
     <div class='table-responsive'>
     <table id='edit-ports' class='table table-striped'>
         <thead>
+<?php if($config['enable_workspace_lookup']) { ?>
+            <tr>
+                <th data-column-id='ifIndex'>Index</th>
+                <th data-column-id='ifName'>Name</th>
+                <th data-column-id='ifAdminStatus'>Admin</th>
+                <th data-column-id='ifOperStatus'>Oper</th>
+                <th data-column-id='Allocatable' data-sortable='false'>Allocatable</th>
+                <th data-column-id='ifAlias'>Description</th>
+            </tr>
+
+<?php } else { ?>
             <tr>
                 <th data-column-id='ifIndex'>Index</th>
                 <th data-column-id='ifName'>Name</th>
@@ -19,6 +30,7 @@
                 <th data-column-id='port_tune' data-sortable='false' data-searchable='false'>RRD Tune</th>
                 <th data-column-id='ifAlias'>Description</th>
             </tr>
+<?php } ?>
         </thead>
     </table>
     </div>
@@ -68,25 +80,21 @@
     });
     $(document).ready(function() {
         $('form#ignoreport').submit(function (event) {
-            $('#disable-toggle').click(function (event) {
+            
+            $('#disalloc-toggle').click(function (event) {
                 // invert selection on all disable buttons
                 event.preventDefault();
-                $('input[name^="disabled_"]').trigger('click');
+                $('input[name^="alloc_"]').trigger('click');
             });
             $('#ignore-toggle').click(function (event) {
                 // invert selection on all ignore buttons
                 event.preventDefault();
                 $('input[name^="ignore_"]').trigger('click');
             });
-            $('#disable-select').click(function (event) {
-                // select all disable buttons
-                event.preventDefault();
-                $('.disable-check').prop('checked', true);
-            });
-            $('#ignore-select').click(function (event) {
+            $('#disalloc-select').click(function (event) {
                 // select all ignore buttons
                 event.preventDefault();
-                $('.ignore-check').prop('checked', true);
+                $('input[name^="alloc_"]').prop('checked', true);
             });
             $('#down-select').click(function (event) {
                 // select ignore buttons for all ports which are down

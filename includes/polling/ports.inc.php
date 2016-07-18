@@ -119,6 +119,7 @@ echo 'Caching Oids: ';
 foreach ($ifmib_oids as $oid) {
     echo "$oid ";
     $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, 'IF-MIB');
+    var_dump($port_stats);
 }
 
 if ($config['enable_ports_etherlike']) {
@@ -230,7 +231,9 @@ foreach ($port_stats as $ifIndex => $port) {
     // Store ifIndex in port entry and prefetch ifName as we'll need it multiple times
     $port['ifIndex'] = $ifIndex;
     $ifName = $port['ifName'];
-
+    if(!filter_port($port)){
+       continue;
+    }
     // Get port_id according to port_association_mode used for this device
     $port_id = get_port_id ($ports_mapped, $port, $port_association_mode);
 

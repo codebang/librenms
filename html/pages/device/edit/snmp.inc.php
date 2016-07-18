@@ -6,10 +6,11 @@ if ($_POST['editing']) {
         $snmpver      = mres($_POST['snmpver']);
         $transport    = $_POST['transport'] ? mres($_POST['transport']) : $transport = 'udp';
         $port         = $_POST['port'] ? mres($_POST['port']) : $config['snmp']['port'];
-        $timeout      = mres($_POST['timeout']);
-        $retries      = mres($_POST['retries']);
+        $transport_type = $_POST['transport_type'];
+        $transport_port = $_POST['transport_port'];
+        $transport_username = $_POST['transport_username'];
+        $transport_password = $_POST['transport_password'];
         $poller_group = mres($_POST['poller_group']);
-        $port_assoc_mode = mres($_POST['port_assoc_mode']);
         $v3           = array(
             'authlevel'  => mres($_POST['authlevel']),
             'authname'   => mres($_POST['authname']),
@@ -26,22 +27,13 @@ if ($_POST['editing']) {
             'port'         => $port,
             'transport'    => $transport,
             'poller_group' => $poller_group,
-            'port_association_mode' => $port_assoc_mode,
+            'transport_type' => $transport_type,
+            'transport_port' => $transport_port,
+            'transport_username' => $transport_username,
+            'transport_password' => $transport_password
         );
 
-        if ($_POST['timeout']) {
-            $update['timeout'] = $timeout;
-        }
-        else {
-            $update['timeout'] = array('NULL');
-        }
 
-        if ($_POST['retries']) {
-            $update['retries'] = $retries;
-        }
-        else {
-            $update['retries'] = array('NULL');
-        }
 
         $update = array_merge($update, $v3);
 
@@ -83,6 +75,11 @@ echo "
     <form id='edit' name='edit' method='post' action='' role='form' class='form-horizontal'>
     <input type=hidden name='editing' value='yes'>
     <div class='form-group'>
+              <div class='col-sm-12 alert alert-info'>
+                  <label class='control-label text-left input-sm'>SNMP Configuration</label>
+              </div>
+    </div>
+    <div class='form-group'>
     <label for='snmpver' class='col-sm-2 control-label'>SNMP Details</label>
     <div class='col-sm-1'>
     <select id='snmpver' name='snmpver' class='form-control input-sm' onChange='changeForm();'>
@@ -108,35 +105,10 @@ foreach ($config['snmp']['transports'] as $transport) {
 echo "      </select>
     </div>
     </div>
-    <div class='form-group'>
-    <div class='col-sm-2'>
-    </div>
-    <div class='col-sm-1'>
-    <input id='timeout' name='timeout' class='form-control input-sm' value='".($device['timeout'] ? $device['timeout'] : '')."' placeholder='seconds' />
-    </div>
-    <div class='col-sm-1'>
-    <input id='retries' name='retries' class='form-control input-sm' value='".($device['timeout'] ? $device['retries'] : '')."' placeholder='retries' />
-    </div>
-    </div>
-    <div class='form-group'>
-      <label for='port_assoc_mode' class='col-sm-2 control-label'>Port Association Mode</label>
-      <div class='col-sm-1'>
-        <select name='port_assoc_mode' id='port_assoc_mode' class='form-control input-sm'>
 ";
 
-foreach (get_port_assoc_modes() as $pam) {
-    $pam_id = get_port_assoc_mode_id ($pam);
-    echo "           <option value='$pam_id'";
 
-    if ($pam_id == $device['port_association_mode'])
-        echo " selected='selected'";
-
-    echo ">$pam</option>\n";
-}
-
-echo "        </select>
-      </div>
-    </div>
+echo " 
     <div id='snmpv1_2'>
     <div class='form-group'>
     <label class='col-sm-3 control-label text-left'><h4><strong>SNMPv1/v2c Configuration</strong></h4></label>
@@ -199,7 +171,48 @@ echo "        </select>
     </div>
     </div>
     </div>";
+?>
 
+         <div class="form-group">
+              <div class="col-sm-12 alert alert-info">
+                  <label class="control-label text-left input-sm">CLI Transport Configuration</label>
+              </div>
+          </div>
+
+         <div class="form-group">
+              <label for="transporttype" class="col-sm-2 control-label">Transport Type</label>
+              <div class="col-sm-2">
+                  <select name="transport_type" id="transport_type" class="form-control input-sm">
+                    <?php
+                         $options = array('telnet'=>'Telnet','SSHv2'=>'SSH V2');
+                         foreach($options as $option => $text){
+                             if ($option == $device['transport_type']){
+                                echo "<option value='".$option."' selected>$text</option>";
+                             }else{
+                                echo "<option value='".$option."'>$text</option>";
+                             }
+                         }
+                    ?>
+                  </select>
+              </div>
+              <div class="col-sm-3">
+                  <?php
+                      echo "<input type='text' name='transport_port' class='flow-control input-sm' value='".$device['transport_port']."'>";
+                  ?>
+              </div>
+              <div class="clearfix"></div>
+          </div>
+          <div class="form-group">
+              <label for="clicredential" class="col-sm-2 control-label">Credential</label>
+              <div class="col-sm-2">
+                  <?php echo "<input type='text' name='transport_username' class='form-control input-sm' value='".$device['transport_username']."'>";?>
+              </div>
+              <div class="col-sm-2">
+                 <?php echo "<input type='password' name='transport_password' class='form-control input-sm' value='".$device['transport_password']."'>";?>
+              </div>
+          </div>
+
+<?php 
 if ($config['distributed_poller'] === true) {
     echo '
         <div class="form-group">
@@ -228,7 +241,7 @@ if ($config['distributed_poller'] === true) {
 
 echo '
     <div class="row">
-        <div class="col-md-1 col-md-offset-2">
+        <div class="col-md-1">
             <button type="submit" name="Submit"  class="btn btn-default"><i class="fa fa-check"></i> Save</button>
         </div>
     </div>

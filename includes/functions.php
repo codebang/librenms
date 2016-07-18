@@ -668,10 +668,10 @@ function notify_dso_for_create_switch($device){
    $output = json_encode($switch);
    $ret_arr = create_switch_for_dms($output);
    if($ret_arr["result"] == 'FAILURE' ){
-       print_error($ret_arr['desc']);
+       print_error($ret_arr['desc'][0]);
    }
    else{
-       print_message($ret_arr['desc']);
+       print_message($ret_arr['desc'][0]);
    }
 
 }
@@ -1616,4 +1616,43 @@ function create_sensor_to_state_index($device, $state_name, $index)
 
         dbInsert($insert, 'sensors_to_state_indexes');
     }
+}
+function filter_ports($ports){
+  $ret_ports = array();
+  foreach($ports as $port){
+    if (filter_port($port)){
+       $ret_ports[]= $port;
+    }
+  }
+  return $ret_ports;
+}
+function filter_port($port){
+    if ($port['ifName'] != NULL and $port['ifName'] != ''){
+       $key_string = 'ifName';
+    }
+    else{
+      $key_string = 'ifDescr';
+    }
+    if(preg_match("/^[eg]/i",$port[$key_string])){
+      return true;
+    }
+    else{
+      return false;
+    }
+}
+
+function getwsfromcache($cache,$port){
+   if ($port['ifName'] == NULL){
+      $key_string = 'ifDescr';
+   }
+   else{
+     $key_string = 'ifName';
+  }
+    if (isset($cache[$port[$key_string]])){
+     $ws = $port2ws[$port[$key_string]];
+    }
+    else{
+     $ws = 'Unbind';
+    }
+    return $ws;
 }

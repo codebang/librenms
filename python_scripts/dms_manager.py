@@ -51,18 +51,12 @@ def createswitch(switch_json):
       sys.exit(-1)
 
 @redis_context
-def updateswitch(switch_ip,account_name,dms_location,redis_server):
+def updateswitch(switch_ip,dms_location,redis_server):
    logger.info('start to update switch(%s)' % switch_ip)
 
    headers = {'content-type': 'application/json'}
    switch = {}
    switch['managementIp'] = switch_ip
-   account_id = redis_server.hget('accounts',account_name)
-   if not account_id:
-      print 'can not find corresponding accountid.'
-      logger.error("can not find corresponding accountid for (%s)" % account_name)
-      sys.exit(-1)
-   switch['accountId'] = account_id
    keys = redis_server.hkeys('locations')
    location_id = None
    for key in keys:
@@ -76,18 +70,26 @@ def updateswitch(switch_ip,account_name,dms_location,redis_server):
    switch['locationId'] = location_id
    switch_json = json.dumps(switch)
    logger.info('request:%s' % switch_json)
-   requests.post('%s/switch' % dso_url,data=switch_json,headers=headers)
+   r = requests.post('%s/switch' % dso_url,data=switch_json,headers=headers)
+   if r.status_code == 201:
+      print 'notify dso to bind location and switch successfully.'
+   else:
+      print 'fail to notify dso to bind location and switch:status_code(%s),content(%s)' % (r.status_code,r.content)
 
 
 @redis_context
-def getworkstationfromport(switchip,port_name,redis_server):
+def getworkstationfordevice(switchip,redis_server):
   key = "switch_" + switchip
-  json_attrib = redis_server.hget(key,port_name) 
-  if json_attrib:
-     switch = json.loads(json_attrib)
-     print switch['workstation']
+  port_names = redis_server.hkeys(key) 
+  if port_names:
+     port2ws = {}
+     for port_name in port_names:
+	value = redis_server.hget(key,port_name)
+        port_info = json.loads(value)
+        port2ws[port_name] = port_info['workstation']
+     print json.dumps(port2ws)
   else:
-     print "none"
+     print ''
 
 
 if __name__ == '__main__':

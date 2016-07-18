@@ -13,36 +13,33 @@ if ($_SESSION['userlevel'] < '7') {
 else {
 
   $panes['device']   = 'Device Settings';
-  $panes['snmp']     = 'SNMP';
-  $panes['transport'] = 'Transport';
-  $panes['dms'] = 'DMS';
+  $panes['snmp']     = 'Connect Settings';
   $panes['ports']    = 'Port Settings';
 
   if (count($config['os'][$device['os']]['icons'])) {
     $panes['icon']  = 'Icon';
   }
 
-  $panes['apps']     = 'Applications';
-  $panes['alerts']   = 'Alert Settings';
-  $panes['alert-rules'] = 'Alert Rules';
-  $panes['modules']  = 'Modules';
+  //$panes['apps']     = 'Applications';
+  #$panes['alerts']   = 'Alert Settings';
+  #$panes['alert-rules'] = 'Alert Rules';
+  #$panes['modules']  = 'Modules';
 
   if ($config['show_services']) {
     $panes['services'] = 'Services';
   }
 
-  $panes['ipmi']     = 'IPMI';
+  #$panes['ipmi']     = 'IPMI';
 
   if (dbFetchCell("SELECT COUNT(sensor_id) FROM `sensors` WHERE device_id = ? AND sensor_deleted='0' LIMIT 1", array($device['device_id'])) > 0) {
     $panes['health'] = 'Health';
   }
 
-  $panes['storage']  = 'Storage';
-  $panes['misc']     = 'Misc';
+  #$panes['storage']  = 'Storage';
+  #$panes['misc']     = 'Misc';
 
-  $panes['component'] = 'Components';
+  #$panes['component'] = 'Components';
   
-  $panes['topology'] = 'Topology Setting';
 
   print_optionbar_start();
 

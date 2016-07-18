@@ -185,7 +185,7 @@ else {
 }//end if
 
 echo '</td>';
-echo "<td width=75 valign=top class='interface-desc'><span class=box-desc>{$port['room']}</span></td>";
+echo "<td width=75 valign=top class='interface-desc'><span class=box-desc>{$port['workstation']}</span></td>";
 echo '<td width=375 valign=top class="interface-desc">';
 
 $neighborsCount=0;

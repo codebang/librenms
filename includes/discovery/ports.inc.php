@@ -45,6 +45,9 @@ foreach ($ports_mapped['maps']['ifIndex'] as $ifIndex => $port_id) {
 // New interface detection
 foreach ($port_stats as $ifIndex => $port) {
     // Store ifIndex in port entry and prefetch ifName as we'll need it multiple times
+    if (!filter_port($port)){
+       continue;     
+    }
     $port['ifIndex'] = $ifIndex;
     $ifName = $port['ifName'];
 

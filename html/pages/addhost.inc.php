@@ -77,7 +77,8 @@ if ($_POST['hostname']) {
             $force_add = 0;
         }
 
-        $port_assoc_mode = $_POST['port_assoc_mode'];
+        //$port_assoc_mode = $_POST['port_assoc_mode'];
+        $port_assoc_mode = "ifIndex";
 
         // CLI transport
         if ($_POST['transporttype'] and $_POST['transporttype'] != 'none') {
@@ -86,12 +87,12 @@ if ($_POST['hostname']) {
         else {
             $transport_type = "";
         }
-//        if ($_POST['transportport']) {
- //           $transport_port = $_POST['transportport'];
-   //     }
-     //   else {
+        if ($_POST['transportport']) {
+            $transport_port = $_POST['transportport'];
+        }
+        else {
             $transport_port = 22;
-       // }
+        }
         if ($_POST['transport_username']) {
             $transport_username = $_POST['transport_username'];
         }
@@ -104,19 +105,15 @@ if ($_POST['hostname']) {
         else {
             $transport_password = "";
         }
-        if ($_POST['transport_enablepassword']) {
-            $transport_enablepassword = $_POST['transport_enablepassword'];
-        }
-        else {
-            $transport_enablepassword = "";
-        }
+        $transport_enablepassword = "";
 
         if ($_POST['dms_location']){
            $dms_location = $_POST['dms_location'];
         }
         else{
-           $dms_location = 'none';
+           $dms_location = 'no support';
         }
+
         $result = addHost($hostname, $snmpver, $port, $transport, 0, $poller_group, $force_add, 
               $port_assoc_mode,$transport_type,$transport_port,$transport_username,$transport_password,$transport_enablepassword,$dms_location,$sn,$description);
          
@@ -141,18 +138,18 @@ $pagetitle[] = 'Add host';
   <div class="col-sm-3">
   </div>
   <div class="col-sm-6">
-<form name="form1" method="post" action="" class="form-horizontal" role="form">
+<form name="form1" id='add_host_form' method="post" action="" class="form-horizontal" role="form">
   <div><h2>Add Device</h2></div>
   <div class="alert alert-info">Devices will be checked for Ping and SNMP reachability before being probed. Only devices with recognised OSes will be added.</div>
   <div class="well well-lg">
     <div class="form-group">
-      <label for="hostname" class="col-sm-3 control-label">Hostname</label>
+      <label for="hostname" class="col-sm-3 control-label">Host</label>
       <div class="col-sm-9">
-        <input type="text" id="hostname" name="hostname" class="form-control input-sm" placeholder="Hostname">
+        <input type="text" id="hostname" name="hostname" class="form-control input-sm" placeholder="host ip">
       </div>
     </div>
     <div class="form-group">
-      <label for="snmpver" class="col-sm-3 control-label">SNMP Version</label>
+      <label for="snmpver" class="col-sm-3 control-label">SNMP</label>
       <div class="col-sm-3">
         <select name="snmpver" id="snmpver" class="form-control input-sm" onChange="changeForm();">
           <option value="v1">v1</option>
@@ -161,7 +158,7 @@ $pagetitle[] = 'Add host';
         </select>
       </div>
       <div class="col-sm-3">
-        <input type="text" name="port" placeholder="port" class="form-control input-sm">
+        <input type="text" name="port" placeholder="port" class="form-control input-sm" value='161'>
       </div>
       <div class="col-sm-3">
         <select name="transport" id="transport" class="form-control input-sm">
@@ -178,12 +175,15 @@ foreach ($config['snmp']['transports'] as $transport) {
         </select>
       </div>
     </div>
+<!--
     <div class="form-group">
       <label for="port_association_mode" class="col-sm-3 control-label">Port Association Mode</label>
       <div class="col-sm-3">
         <select name="port_assoc_mode" id="port_assoc_mode" class="form-control input-sm">
-<?php
+-->
 
+<?php
+/*
 
 foreach (get_port_assoc_modes() as $mode) {
     $selected = "";
@@ -192,18 +192,20 @@ foreach (get_port_assoc_modes() as $mode) {
 
     echo "          <option value=\"$mode\" $selected>$mode</option>\n";
 }
+*/
 ?>
-        </select>
+<!--        </select>
       </div>
     </div>
-   <div class="form-group">
+-->
+   <div class="form-group" id='description_group'>
      <label for="description" class="col-sm-3 control-label">Description</label>
      <div class="col-sm-9">
-     <input type="text" id="description" name="description" class="form-control input-sm" placeholder="device description">
+     <input type="text" id="description" name="description" class="form-control input-sm" require data-fv-notempty-message="Description is required." placeholder="device description">
      </div>
    </div>
    <div class="form-group">
-     <label for="sn" class="col-sm-3 control-label">Serial Number</label>
+     <label for="sn" class="col-sm-3 control-label">SN</label>
      <div class="col-sm-9">
      <input type="text" id="sn" name="sn" class="form-control input-sm" placeholder="serial number">
      </div>
@@ -311,43 +313,45 @@ if ($config['distributed_poller'] === true) {
               </div>
           </div>
           <div class="form-group">
-              <label for="transporttype" class="col-sm-3 control-label">Transport Type</label>
+              <label for="transporttype" class="col-sm-3 control-label">Transport</label>
               <div class="col-sm-3">
-                  <select name="transporttype" id="transporttype" class="form-control input-sm">
-                      <option value="none" selected>None</option>
-                      <option value="telnet">Telnet</option>
+                  <select name="transporttype" id="transporttype" class="form-control input-sm" onChange="changeTransport();">
                       <option value="SSHv2">SSH V2</option>
+                      <option value="telnet">Telnet</option>
                   </select>
               </div>
               <div class="col-sm-3">
-                  <input type="text" name="transportport" placeholder="transport port" class="form-control input-sm">
+                  <input type="text" name="transportport" id="transportport" placeholder="port" class="form-control input-sm" value='22'>
               </div>
           </div>
           <div class="form-group">
               <label for="clicredential" class="col-sm-3 control-label">Credential</label>
-              <div class="col-sm-3">
-                  <input type="text" name="transport_username" placeholder="username" class="form-control input-sm">
+              <div class="col-sm-4">
+                  <input type="text" name="transport_username" id="transport_username" placeholder="username" class="form-control input-sm">
               </div>
-              <div class="col-sm-3">
-                  <input type="text" name="transport_password" placeholder="password" class="form-control input-sm">
+              <div class="col-sm-5">
+                  <input type="text" name="transport_password" id="transport_password" placeholder="password" class="form-control input-sm">
               </div>
-              <div class="col-sm-3">
+              <!--
+                  <div class="col-sm-3">
                   <input type="text" name="transport_enablepassword" placeholder="enable password" class="form-control input-sm">
               </div>
+              -->
           </div>
+<?php if($config['enable_location_feature']){ ?>
           <div class='form-group'>
               <div class="col-sm-12 alert alert-info">
                   <label class="control-label text-left input-sm">DMS Configuration(optional)</label>
               </div>
           </div>
           <div class="form-group">
-              <label for="location" class="col-sm-3 control-label">location</label>
+              <label for="location" class="col-sm-3 control-label">Location</label>
               <div class="col-sm-9">
                   <select name="dms_location" id="dms_location" class="form-control input-sm">
                       <?php
                            $ret_arr = list_location();
                            $locations = $ret_arr['desc'];
-                           array_unshift($locations,"none");
+                           array_unshift($locations,$config['device_default_location']);
                            foreach ($locations as $location){
                                echo "<option value={$location}>{$location}</option>";
                            }
@@ -355,6 +359,7 @@ if ($config['distributed_poller'] === true) {
                   </select>
               </div>
           </div>
+<?php } ?>
     <hr>
     <center><button type="submit" class="btn btn-default" name="Submit">Add Device</button></center>
   </div>
@@ -375,5 +380,63 @@ if ($config['distributed_poller'] === true) {
             $('#snmpv3').show();
         }
     }
+    function changeTransport(){
+        current_tranport = $("#transporttype").val();
+        if (current_tranport == 'SSHv2') {
+           $("#transportport").val('22');
+        }
+        else if (current_tranport == 'telnet'){
+           $("#transportport").val('161');
+        }
+    }
     $('#snmpv3').toggle();
+    $(document).ready(function() {
+    	$('#add_host_form').bootstrapValidator({
+          feedbackIcons: {
+             valid: 'glyphicon glyphicon-ok',
+             invalid: 'glyphicon glyphicon-remove',
+             validating: 'glyphicon glyphicon-refresh'
+          },
+         fields: {
+            description: {
+                validators: {
+                    notEmpty: {
+                        message: 'Device Description is required.'
+                    }
+                }
+            },
+            hostname: {
+                validators: {
+                    notEmpty: {
+                        message: 'Host is required.'
+                    }
+                }
+            },
+            community: {
+                validators: {
+                    notEmpty: {
+                        message: 'Community is required.'
+                    }
+                }
+            },
+            transport_username: {
+                validators: {
+                    notEmpty: {
+                        message: 'username is required.'
+                    }
+                }
+            },
+            transport_password: {
+                validators: {
+                    notEmpty: {
+                        message: 'password is required.'
+                    }
+                }
+            }
+          
+        } /* <-- added closing brace */
+       });
+   });
+
 </script>
+
