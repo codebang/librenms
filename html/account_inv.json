@@ -17,146 +17,177 @@
                         {
                             "type": "workstation",
                             "name": "101",
+                            "portid": 1,
                             "link": "ports/"
                         },
                         {
                             "type": "workstation",
                             "name": "101",
+                            "portid": 2,
                             "link": "ports/"
                         },
                         {
                             "type": "port",
                             "name": "101",
+                            "status": "enable",
+                            "portid": 3,
                             "link": "ports/"
                         },
                         {
                             "type": "workstation",
                             "name": "101",
+                            "portid": 4,
                             "link": "ports/"
                         },
                         {
                             "type": "workstation",
                             "name": "101",
+                            "portid": 5,
                             "link": "ports/"
                         },
                         {
                             "type": "workstation",
                             "name": "101",
+                            "portid": 6,
                             "link": "ports/"
                         },
                         {
                             "type": "port",
                             "name": "101",
+                            "status": "enable",
+                            "portid": 7,
                             "link": "ports/"
                         },
                         {
                             "type": "workstation",
                             "name": "101",
+                            "portid": 8,
                             "link": "ports/"
                         },
                         {
                             "type": "workstation",
                             "name": "101",
+                            "portid": 9,
                             "link": "ports/"
                         },
                         {
                             "type": "workstation",
                             "name": "101",
+                            "portid": 10,
                             "link": "ports/"
                         },
                         {
                             "type": "workstation",
                             "name": "101",
+                            "portid": 11,
                             "link": "ports/"
                         },
                         {
                             "type": "workstation",
                             "name": "101",
+                            "portid": 12,
                             "link": "ports/"
                         },
                         {
                             "type": "workstation",
                             "name": "101",
+                            "portid": 13,
                             "link": "ports/"
                         },
                         {
                             "type": "workstation",
                             "name": "101",
+                            "portid": 14,
                             "link": "ports/"
                         },
                         {
                             "type": "workstation",
                             "name": "101",
+                            "portid": 15,
                             "link": "ports/"
                         },
                         {
                             "type": "workstation",
                             "name": "101",
+                            "portid": 16,
                             "link": "ports/"
                         },
                         {
                             "type": "workstation",
                             "name": "101",
+                            "portid": 17,
                             "link": "ports/"
                         },
                         {
                             "type": "workstation",
                             "name": "101",
+                            "portid": 18,
                             "link": "ports/"
                         },
                         {
                             "type": "workstation",
                             "name": "101",
+                            "portid": 19,
                             "link": "ports/"
                         },
                         {
                             "type": "workstation",
                             "name": "101",
+                            "portid": 20,
                             "link": "ports/"
                         },
                         {
                             "type": "workstation",
                             "name": "101",
+                            "portid": 21,
                             "link": "ports/"
                         },
                         {
                             "type": "workstation",
                             "name": "101",
+                            "portid": 22,
                             "link": "ports/"
                         },
                         {
                             "type": "workstation",
                             "name": "101",
+                            "portid": 23,
                             "link": "ports/"
                         },
                         {
                             "type": "workstation",
                             "name": "101",
+                            "portid": 24,
                             "link": "ports/"
                         },
                         {
                             "type": "workstation",
                             "name": "101",
+                            "portid": 25,
                             "link": "ports/"
                         },
                         {
                             "type": "workstation",
                             "name": "101",
+                            "portid": 26,
                             "link": "ports/"
                         },
                         {
                             "type": "workstation",
                             "name": "101",
+                            "portid": 27,
                             "link": "ports/"
                         },
                         {
                             "type": "workstation",
                             "name": "101",
+                            "portid": 28,
                             "link": "ports/"
                         },
                         {
                             "type": "workstation",
                             "name": "101",
+                            "portid": 29,
                             "link": "ports/"
                         }
                     ]

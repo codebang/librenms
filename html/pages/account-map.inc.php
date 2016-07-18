@@ -9,6 +9,9 @@ $pagetitle[] = 'Account Topology';
 
 <style type="text/css">
 
+    #account-topo svg {
+        z-index: -1000;
+    }
 
     .node circle {
         cursor: pointer;
@@ -77,9 +80,100 @@ $pagetitle[] = 'Account Topology';
         cursor: pointer;
     }
 
+    image.nodeinvisible {
+        display: none;
+        width: 20px;
+        height: 20px;
+    }
+
+    image.nodevisible {
+        display: block;
+        width: 20px;
+        height: 20px;
+    }
+    image.nodevisible:hover {
+        cursor: pointer;
+    }
+
+    #port-config.inactive {
+        display: none;
+    }
+
+    #port-config.active {
+        z-index: 1000;
+        display: block;
+        position: fixed;
+        box-sizing: border-box;
+        width: 30%;
+        color: #616161;
+        font-size: 13px;
+        line-height: 1.53846154;
+        direction: ltr;
+        -webkit-font-smoothing: antialiased;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    }
+    .port-widget {
+        position: relative;
+        margin-bottom: 20px;
+        display: table;
+        width: 100%;
+        -webkit-border-radius: 1px;
+        -moz-border-radius: 1px;
+        border-radius: 1px;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .port-config-title {
+        /*margin: 0 15px;*/
+        /*padding: 10px 0;*/
+        font-size: 20px;
+        color: white;
+        background-color: #0099cc;
+        /*border-bottom: 1px solid rgba(0, 0, 0, 0.05);*/
+    }
+
+    .port-config-body {
+        padding: 15px;
+    }
+
+    .port-config-body > ul {
+        margin-bottom: 0;
+    }
+
+    .port-config-footer {
+        padding: 10px 15px;
+        border-bottom-right-radius: 1px;
+        border-bottom-left-radius: 1px;
+    }
+
 </style>
 
 <div id="account-topo">
+</div>
+<div id="port-config" class="inactive">
+    <div class="row" style="margin-left: 0px; margin-right: 0px;">
+        <div id="port-config-title" class="col-sm-12 port-config-title"><span>Port Config</span></div>
+        <div class="port-widget">
+            <div id="port-config-body" class="col-sm-12 port-config-body">
+                <ul class="list-unstyled">
+                    <div class="col-sm-6" style="padding-left: 0px;"><span>Port Allocatable</span></div>
+                    <div class="col-sm-6 bootstrap-switch-container" style="margin-left: 0px;">
+                        <input type="checkbox" id="port-config-status" name="port-config-status" data-size="small">
+                    </div>
+                </ul>
+            </div>
+            <div id="port-config-footer" class="col-sm-12 port-config-footer">
+                <div class="col-sm-6">
+                    <button id="update-port-config" class="btn btn-default btn-sm" style="float:right; margin-right: 10px;">Update</button>
+                </div>
+                <div class="col-sm-6">
+                    <button id="close-port-config" class="btn btn-default btn-sm" style="float:left; margin-left: 10px;">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 <script type="text/javascript">
@@ -109,7 +203,7 @@ $pagetitle[] = 'Account Topology';
         root.y0 = 0;
 
         function toggleAll(d) {
-            console.debug(d);
+//            console.debug(d);
             if (d.children) {
                 d.children.forEach(toggleAll);
                 if (d.type && d.type == "switch")
@@ -146,6 +240,12 @@ $pagetitle[] = 'Account Topology';
             });
 
         nodeEnter.append("image")
+            .attr("id", function(d) {
+                if (d.type && d.type == "port")
+                {
+                    return "switchport-" + d.portid;
+                }
+            })
             .attr("xlink:href", function(d) {
                 if (d.type)
                 {
@@ -159,7 +259,15 @@ $pagetitle[] = 'Account Topology';
                         case "workstation":
                             return "images/workstation.png";
                         case "port":
-                            return "images/workport.png";
+                        {
+                            if (d.status == "disable")
+                            {
+                                return "images/portadmin.png";
+                            }
+                            else {
+                                return "images/workport.png";
+                            }
+                        }
                     }
                 }
                 return "images/switch.png";
@@ -266,6 +374,54 @@ $pagetitle[] = 'Account Topology';
             })
             .style("fill-opacity", 1e-6);
 
+        nodeEnter.append("image")
+            .attr("xlink:href", function(d) {
+                return "images/edit.png";
+            })
+            .attr("class", function(d) {
+                if (d.type)
+                {
+                    switch(d.type) {
+                        case "port":
+                            return "nodevisible";
+                    }
+                }
+                return "nodeinvisble";
+            })
+            .attr("x", function(d) {
+                if (d.type == "port")
+                {
+                    return 35;
+                }
+            })
+            .attr("y", function(d) {
+                if (d.type == "port")
+                {
+                    return -15;
+                }
+            })
+            .on("click", function(d){
+                var portId = d.portid;
+                var imageType = d3.select("#switchport-" + portId).attr("xlink:href");
+                if (imageType == "images/workport.png")
+                {
+                    $('input[name="port-config-status"]').bootstrapSwitch('state', true, true);
+                }
+                else {
+                    $('input[name="port-config-status"]').bootstrapSwitch('state', false, false);
+                }
+
+                $("#port-config-title span").text(d.name);
+                $("#port-config-status").data("port-id", d.portid);
+                var xPos = d3.event.pageX + 15;
+                var yPos = d3.event.pageY - 20;
+                $("#port-config")
+                .css("top", yPos + 'px')
+                .css("left", xPos + 'px')
+                .removeClass("inactive")
+                .addClass("active");
+            });
+
         // Transition nodes to their new position.
         var nodeUpdate = node.transition()
             .duration(duration)
@@ -330,5 +486,74 @@ $pagetitle[] = 'Account Topology';
            d._children = null;
          }
     }
+
+    $("#close-port-config").click(function(){
+        closeConfigWindow();
+    });
+
+    $("#update-port-config").click(function(){
+        var portId = $("#port-config-status").data("port-id");
+        var state = $('input[name="port-config-status"]').bootstrapSwitch('state');
+
+        if (state)
+        {
+            d3.select("#switchport-" + portId).attr("xlink:href", "images/workport.png");
+        }
+        else {
+            d3.select("#switchport-" + portId).attr("xlink:href", "images/portadmin.png");
+        }
+
+        closeConfigWindow();
+
+//        update_port_status(portId, state);
+    });
+
+    $("[name='port-config-status']").bootstrapSwitch("offColor", "danger");
+    $("[name='port-config-status']").bootstrapSwitch("onColor", "success");
+//    $("[name='port-config-status']").bootstrapSwitch("onText", "Yes");
+//    $("[name='port-config-status']").bootstrapSwitch("offText", "No");
+
+    $('input[name="port-config-status"]').on('switchChange.bootstrapSwitch',  function(event, state) {
+//        console.debug(state);
+    });
+
+    function closeConfigWindow() {
+        $("#port-config")
+            .removeClass("active")
+            .addClass("inactive");
+    }
+
+    function update_port_status(portId, state) {
+        event.preventDefault();
+        $.ajax({
+            type: 'POST',
+            url: 'ajax_form.php',
+            data: { "portid": portId, "status": state},
+            dataType: 'json',
+            success: function(data) {
+                if (data.status == 'ok') {
+                    toastr.success(data.message);
+                }
+                else {
+                    toastr.error(data.message);
+                    return;
+                }
+
+                if (state)
+                {
+                    d3.select("#switchport-" + portId).attr("xlink:href", "images/workport.png");
+                }
+                else {
+                    d3.select("#switchport-" + portId).attr("xlink:href", "images/portadmin.png");
+                }
+
+                closeConfigWindow();
+            },
+            error: function() {
+                toastr.error('Could not set this override');
+            }
+        });
+    }
+
 
 </script>
