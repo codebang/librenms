@@ -86,15 +86,30 @@
                 event.preventDefault();
                 $('input[name^="alloc_"]').trigger('click');
             });
+            $('#disalloc-select').click(function (event) {
+                // select all ignore buttons
+                event.preventDefault();
+                $('input[name^="alloc_"]').prop('checked', true);
+            });
+            $('#disable-toggle').click(function (event) {
+                // invert selection on all disable buttons
+                event.preventDefault();
+                $('input[name^="disabled_"]').trigger('click');
+            });
             $('#ignore-toggle').click(function (event) {
                 // invert selection on all ignore buttons
                 event.preventDefault();
                 $('input[name^="ignore_"]').trigger('click');
             });
-            $('#disalloc-select').click(function (event) {
+            $('#disable-select').click(function (event) {
+                // select all disable buttons
+                event.preventDefault();
+                $('.disable-check').prop('checked', true);
+            });
+            $('#ignore-select').click(function (event) {
                 // select all ignore buttons
                 event.preventDefault();
-                $('input[name^="alloc_"]').prop('checked', true);
+                $('.ignore-check').prop('checked', true);
             });
             $('#down-select').click(function (event) {
                 // select ignore buttons for all ports which are down
@@ -141,6 +156,10 @@
                             $("#message").html('<div class="alert alert-info">' + data.message + '</div>')
                         } else {
                             $("#message").html('<div class="alert alert-danger">' + data.message + '</div>');
+                        }
+                        for( var port_id in data.port_alloc){
+                             var current = data.port_alloc[port_id];
+                             $("input[name=oldalloc_"+ port_id + "]").val(current);
                         }
                     },
                     error: function(){

@@ -1381,7 +1381,7 @@ function get_topology(){
       $location['link'] = "devices/group={$group_id}";
       $switches = array();
       foreach($devices as $device){
-          $cache = getworkstationfordevice($device['hostname']);
+          $cache = getWorkstationForDevice($device['hostname']);
           $switch = array();
           if ($device['description'] == ''){
              $switch['name'] = $device['hostname'];
@@ -1393,23 +1393,25 @@ function get_topology(){
           $switch['type'] = 'switch';
           $switch['link'] = '/device/device='."{$device['device_id']}";
           $port_binding = array();
-          $sql = 'select port_id,ifName from ports where device_id =? and ifName not like "NULL%" and ifName not like "InLoopBack%" and ifName not like "Vlan-interface%"';
+          $sql = 'select port_id,ifName,allocatable from ports where device_id =? and ifName not like "NULL%" and ifName not like "InLoopBack%" and ifName not like "Vlan-interface%"';
           $params = array($device['device_id']);
           $ports = dbFetchRows($sql,$params);
           $switch['total'] = count($ports); 
           $used = 0;
           foreach($ports as $port){
              $port_room = array();
-             if (isset($cache[$port])){
+             if (isset($cache[$port['ifName']])){
                $port_room['type'] = 'workstation';
-               $port_room['name'] = $ws;
+               $port_room['name'] = $cache[$port['ifName']];
                $used = $used + 1;
              }
              else{
                $port_room['type'] = 'port';
+               $port_room['status'] = $port['allocatable']?'enable':'disable';
                $port_room['name'] = $port['ifName'];
              }
              $port_room['link'] = "device/device={$device['device_id']}/tab=port/port={$port['port_id']}";
+             $port_room['portid'] = $port['port_id'];
              array_push($port_binding,$port_room);
           }
          $switch['used'] = $used;
@@ -1425,4 +1427,62 @@ function get_topology(){
    $app->response->headers->set('Content-Type', 'application/json');
    echo _json_encode($inv);
 }
+function update_port_status(){
+    global $config;
+    $app = \Slim\Slim::getInstance();
+    $router = $app->router()->getCurrentRoute()->getParams();
+    $data = json_decode(file_get_contents('php://input'), true);
+    $port_id = $_POST['portid'];
+    $port_allocable = $_POST['status'];
+    if($port_allocable=='true'){
+       $expect_alloc = 1;
+    }  
+    else{
+      $expect_alloc = 0;
+    }
+    $debug = $expect_alloc;
+    $port = get_port_by_id($port_id);
+    $device = device_by_id_cache($port['device_id']);
+    $cache = getWorkstationForDevice($device['hostname']);   
+    $key = ifLabel($port,$device)['label'];
 
+    if (isset($cache[$key])){
+        $code = 200;
+        $output = array(
+           'status'  => 'fail',
+           'message' => 'this port has been bound to workstation,cannot edit.',
+         );
+    }
+    else{
+      $ports = array();
+      $ports[]= $port;
+      $arr = notify_dso_for_port($device['hostname'],$ports,$expect_alloc?false:true);
+      if($arr['result'] == 'SUCCESS'){
+        if(dbUpdate(array('allocatable'=>$expect_alloc),'ports','port_id=?',array($port_id))){
+          $code = 201;
+          $output = array(
+             'status'  => 'ok',
+             'message' => 'update successfully.',
+          );
+        }
+        else{
+            $code = 200;
+            $output = array(
+              'status'  => 'fail',
+              'message' => 'Fail to update db.'
+            );
+        }
+      }
+      else{
+        $code = 200;
+        $output = array(
+         'status'  => 'fail',
+         'message' => $arr['desc']
+         );
+      }
+    }
+
+    $app->response->setStatus($code);
+    $app->response->headers->set('Content-Type', 'application/json');
+    echo _json_encode($output);
+}

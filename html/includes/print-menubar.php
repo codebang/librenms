@@ -534,7 +534,7 @@ if ($_SESSION['authenticated']) {
 ?>
 
            <li role="presentation" class="divider"></li>
-           <li><a href="about/"><i class="fa fa-exclamation-circle fa-fw fa-lg"></i> About&nbsp;<?php echo($config['project_name']); ?></a></li>
+           <li><a href="about/"><i class="fa fa-exclamation-circle fa-fw fa-lg"></i> About&nbsp;TNMS</a></li>
          </ul>
        </li>
      </ul>

@@ -48,6 +48,22 @@ if ($_POST['editing']) {
         if ($rows_updated > 0 || $updated) {
             $update_message = "Device record updated.";
             $updated = 1;
+            if($config['']){
+                $device_proxy = array();
+                if(isset($update_item['description'])){
+                       $device_proxy['description'] = $update_item['description'];
+                }
+                if(isset($update_item['sn'])){
+                       $device_proxy['sn'] = $update_item['sn'];
+                }
+                if(isset($update_item['dms_location'])){
+                      $device_proxy['dms_location'] = $update_item['dms_location'];
+                }
+                if(count($device_proxy) > 0){
+                      $device_proxy['hostname'] = $device['hostname'];
+                      notify_dso_for_create_switch($device_proxy);
+                }
+            }
             $device = dbFetchRow("SELECT * FROM `devices` WHERE `device_id` = ?", array($device['device_id']));
         }
         elseif ($rows_updated = '-1') {
@@ -152,7 +168,7 @@ elseif ($update_message) {
 <div class="form-group">
      <label for="location" class="col-sm-2 control-label">Location</label>
      <div class="col-sm-5">
-            <select name="dms_location" id="location" class="form-control input-sm">
+            <select name="dms_location" id="location" class="form-control input-sm" <?php if($device['dms_location'] != $config['device_default_location']) {echo('disabled="1"');} ?> >
                  <?php
                        $loc_db = $device['dms_location'];
                        $ret_arr = list_location();

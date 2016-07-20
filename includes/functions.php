@@ -624,7 +624,9 @@ function createHost($host, $community = NULL, $snmpver, $port = 161, $transport 
             $device_id = dbInsert($device, 'devices');
             if ($device_id) {
                 handle_device_group($device["dms_location"]);
-                notify_dso_for_create_switch($device);
+                if($config['enable_location_feature']){
+                    notify_dso_for_create_switch($device);
+                }
                 return($device_id);
             }
             else {
@@ -647,24 +649,27 @@ function notify_dso_for_create_switch($device){
    $redis_server = $config['redis_server'];
    $redis_port = $config['redis_port'];
    $switch = array();
-   $switch ['description'] = $device["description"];
-   $switch['sn'] = $device["sn"];
+   if (isset($device["description"])){
+      $switch ['description'] = $device["description"];
+   }
+   if(isset($device["sn"])){
+      $switch['sn'] = $device["sn"];
+   }
    $switch['managementIp'] = $device['hostname'];
-   $port_stats = array();
-   $port_stats = snmpwalk_cache_oid($device, 'ifDescr', $port_stats, 'IF-MIB');
-   $port_stats = snmpwalk_cache_oid($device, 'ifName', $port_stats, 'IF-MIB');
-   $port_stats = snmpwalk_cache_oid($device, 'ifType', $port_stats, 'IF-MIB');
-   d_echo($port_stats);
-   $ports = array();
-   foreach ($port_stats as $port_info){
-      if(preg_match("/^[G|E]/",$port_info['ifName'])){
-           $port = array();
-           $port['name'] = $port_info['ifName'];
-           array_push($ports,$port);
+   if(isset($device['dms_location'])){
+   if ($device['dms_location'] != $config['device_default_location']){    
+      $loc_ret_arr = get_location_id_from_name($device['dms_location']); 
+      if ($loc_ret_arr['result'] == 'SUCCESS'){
+         if(count($loc_ret_arr['desc']) == 1){
+            $switch['locationId'] = $loc_ret_arr['desc'][0];
+         }
+      }
+      else{
+          print_error($loc_ret_arr['desc']);
+          return;
       }
    }
-   $switch['ports'] = $ports;
-   $switch['portcount'] = count($ports);
+   }
    $output = json_encode($switch);
    $ret_arr = create_switch_for_dms($output);
    if($ret_arr["result"] == 'FAILURE' ){
@@ -676,17 +681,27 @@ function notify_dso_for_create_switch($device){
 
 }
 
+function notify_dso_for_port($device_manageip,$ports,$action){
+  global $config;
+  $dso_url = $config['dso_url'];
+  $switch = array('managementIp' => $device_manageip);
+  $ports_info = array();
+  foreach($ports as $port){
+     $port_info = array();
+     $port_info['name'] = ifLabel($port)['label'];
+     $ports_info[]= $port_info;
+  }
+ $switch["ports"] = $ports_info;
+ $switch["portcount"] = count($ports);
+ $output = json_encode($switch);
+ return update_switch_for_dms($output,$action);
+}
+
 function handle_device_group($dms_location){
-   if ($dms_location == 'none'){
-     $group_name = 'Default';
-   }
-   else{
-     $group_name = $dms_location;
-   }
-   if (!CheckGroupExist($group_name)){
+   if (!CheckGroupExist($dms_location)){
         $desc = "group by location";
         $pattern = "%devices.dms_location = '{$dms_location}'";
-        AddDeviceGroup($group_name,$desc,$pattern); 
+        AddDeviceGroup($dms_location,$desc,$pattern); 
    }
 }
 
@@ -1006,13 +1021,26 @@ function is_port_valid($port, $device) {
         }
         if (is_array($config['bad_iftype'])) {
             $fringe = $config['bad_iftype'];
-            if( is_array($config['os'][$device['os']]['bad_iftype']) ) {
-                $fringe = array_merge($config['bad_iftype'],$config['os'][$device['os']]['bad_iftype']);
+            if(is_array($config['os'][$device['os']]['include_iftype'])){
+                $types = $config['os'][$device['os']]['include_iftype'];
+                $match = false;
+                foreach ($types as $type) {
+                    if (strstr($port['ifType'], $type)) {
+                        $match = true;
+                        break;
+                    }
+                }
+                $valid = $match?1:0;
             }
-            foreach ($fringe as $bi) {
-                if (strstr($port['ifType'], $bi)) {
-                    $valid = 0;
-                    d_echo("ignored ifType : ".$port['ifType']." (matched: ".$bi." )");
+            else{               
+                if( is_array($config['os'][$device['os']]['bad_iftype']) ) {
+                    $fringe = array_merge($config['bad_iftype'],$config['os'][$device['os']]['bad_iftype']);
+                }
+                foreach ($fringe as $bi) {
+                    if (strstr($port['ifType'], $bi)) {
+                        $valid = 0;
+                        d_echo("ignored ifType : ".$port['ifType']." (matched: ".$bi." )");
+                    }
                 }
             }
         }

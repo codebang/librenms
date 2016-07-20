@@ -1,0 +1,1 @@
+python /opt/librenms/python_scripts/device_executor.py -d 192.168.1.4 -u root -a cisco123 -m comware ports_enable '[{"port":"Ethernet1/0/4","vlan":"105","speed_limit":"256"}]'

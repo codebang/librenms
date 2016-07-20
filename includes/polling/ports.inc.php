@@ -231,9 +231,6 @@ foreach ($port_stats as $ifIndex => $port) {
     // Store ifIndex in port entry and prefetch ifName as we'll need it multiple times
     $port['ifIndex'] = $ifIndex;
     $ifName = $port['ifName'];
-    if(!filter_port($port)){
-       continue;
-    }
     // Get port_id according to port_association_mode used for this device
     $port_id = get_port_id ($ports_mapped, $port, $port_association_mode);
 

@@ -699,7 +699,6 @@ $config['poller_modules']['toner']         = 1;
 $config['poller_modules']['ucd-diskio']    = 1;
 $config['poller_modules']['wifi']          = 1;
 $config['poller_modules']['ospf']          = 1;
-$config['poller_modules']['mac-address']   = 1;
 $config['poller_modules']['cisco-ipsec-flow-monitor']    = 1;
 $config['poller_modules']['cisco-remote-access-monitor'] = 1;
 $config['poller_modules']['cisco-cef']                   = 1;

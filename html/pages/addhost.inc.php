@@ -32,7 +32,7 @@ if ($_POST['hostname']) {
             $sn = mres($_POST['sn']);
         }
         else {
-            $sn = '';
+            $sn = NULL;
         }
 
         if ($_POST['description']) {

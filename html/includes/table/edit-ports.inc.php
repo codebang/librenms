@@ -44,7 +44,7 @@ $response[] = array(
     'label' => '',
     'ifAdminStatus' => '',
     'ifOperStatus' => '',
-    'Allocatable' => "<button type='submit' value='Toggle' class='btn btn-default btn-sm' id='disalloc-toggle' title='toggle all the selectd ports'>Select All</button><button type='submit' value='Select' class='btn btn-default btn-sm' id='disalloc-select' title='Select all the ports'>Select All</button>",
+    'Allocatable' => "<button type='submit' value='Toggle' class='btn btn-default btn-sm' id='disalloc-toggle' title='toggle all the selectd ports'>Toggle</button><button type='submit' value='Select' class='btn btn-default btn-sm' id='disalloc-select' title='Select all the ports'>Select All</button>",
     'ifAlias' => ''
 );
 $cache = getWorkstationForDevice($device_ip);
@@ -74,7 +74,7 @@ foreach ($ports as $port) {
       //update the mismatching
       $ws = getwsfromcache($cache,$port);
       if ($ws != $config['port_unbind_constant'] && $port['allocatable'] == 0){
-            $updated = dbUpdate(array('allocatable' => 1), 'ports', '`port_id` = ?', $port['port_id']);
+            $updated = dbUpdate(array('allocatable' => 1), 'ports', '`port_id` = ?', array($port['port_id']));
             $port['allocatable'] = 1;
             $port['ws_binding'] = true;
 

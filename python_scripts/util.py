@@ -1,72 +1,106 @@
 import os
 import subprocess
 import logging
+import logging.handlers
 import sys
 import json
 import time
+import datetime
+import MySQLdb
+
 from kafka import KafkaClient,SimpleProducer
 
 ob_install_dir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 config_file = ob_install_dir + '/config.php'
 
 
+
+
 def get_config_data():
-    config_cmd = ['/usr/bin/env', 'php', '%s/config_to_json.php' % ob_install_dir]
+    try:
+        with open(config_file) as f:
+            pass
+    except IOError as e:
+        print "ERROR: Oh dear... %s does not seem readable" % config_file
+        sys.exit(-1)
+
+    config_cmd = [ 'php', '%s/config_to_json.php' % ob_install_dir]
     try:
         proc = subprocess.Popen(config_cmd, stdout=subprocess.PIPE, stdin=subprocess.PIPE)
     except Exception,e:
         print e.message
         print "ERROR: Could not execute: %s" % config_cmd
-        sys.exit(2)
-    return proc.communicate()[0]
 
-try:
-    with open(config_file) as f:
-        pass
-except IOError as e:
-    print "ERROR: Oh dear... %s does not seem readable" % config_file
-    sys.exit(2)
-
-config = {}
-
-try:
-    config = json.loads(get_config_data())
-except Exception,e:
-    print e.message
-    print "ERROR: Could not load or parse configuration, are PATHs correct?"
-    sys.exit(2)
+    try:
+        return json.loads(proc.communicate()[0])
+    except Exception,e:
+        print e.message
 
 
-logger = logging.getLogger('python_executor')
+
+config = get_config_data()
+
+
+
+logger = logging.getLogger('tnms')
 logger.setLevel(logging.INFO)
 
 fh = logging.FileHandler(config["log_file"])
 fh.setLevel(logging.DEBUG)
-
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 fh.setFormatter(formatter)
 logger.addHandler(fh)
 
+if config['sender']['syslog_enable']:
+    if config['sender']['syslog']['address'].startswith(os.path.sep):
+       syslog_handler = logging.handlers.SysLogHandler(address=config['sender']['syslog']['address'])
+    else:
+       syslog_handler = logging.handlers.SysLogHandler(address=(config['sender']['syslog']['address'],514))
+    logger.addHandler(syslog_handler)
 
 
-def sendalarm(accountId,host,item,severity,message):
+
+def sendalarmtokakfa(host,item,message):
     msg={}
     msg["@timestamp"] = int(round(time.time() * 1000))
-    msg["accountId"] = accountId
-    msg["host"] = host
+    msg["accountId"] = 'dms_server'
+    msg["host"] =  host
     msg["item"] = item
-    msg["severity"] = severity
+    msg["severity"] = 'Critical'
     msg["message"] = message
     transport_string = json.dumps(msg)
-    broker_list = config['kafka_brokers']
-    alarm_topic = config['kafka_alert_topic']
-    kafka = KafkaClient(broker_list)
-    producer = SimpleProducer(kafka)
+    broker_list = config['sender']['kafka']['kafka_brokers']
+    alarm_topic = config['sender']['kafka']['kafka_alert_topic']
+    print alarm_topic
+    kafka_client = KafkaClient(broker_list)
+    print broker_list
+    producer = SimpleProducer(kafka_client)
     try:
-      producer.send_message(b"%s" % transport_string, alarm_topic)
+      producer.send_messages(alarm_topic, b"%s" % transport_string)
     except Exception as err:
-      logger.error(err.message)
+      print err.message
     finally:
-      kafka.close()
-      
-  
+      kafka_client.close()
+
+
+def log_event(host,message,type,reference):
+    db_host = config['db_host']
+    user = config['db_user']
+    pwd = config['db_pass']
+    database = config['db_name']
+    try:
+        connect = MySQLdb.connect(db_host,user,pwd,database)
+        db = connect.cursor()
+        db.execute("""select device_id from devices where hostname='%s'""" % (host))
+        row = db.fetchone()
+        device_id = int(row[0])
+        print """insert into eventlog (host,datetime,message,type,reference) values(%s,'%s','%s',%s,%s) """ % (device_id,datetime.datetime.now(),message,type,reference)
+        db.execute("""insert into eventlog (host,datetime,message,type,reference) values(%s,'%s','%s','%s','%s') """ % (device_id,datetime.datetime.now(),message,'NULL','NULL'))
+        connect.commit()
+    except Exception,e:
+        print e.message
+    finally:
+        try:
+            connect.close()
+        finally:
+            pass

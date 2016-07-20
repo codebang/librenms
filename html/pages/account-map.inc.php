@@ -497,18 +497,7 @@ $pagetitle[] = 'Account Topology';
     $("#update-port-config").click(function(){
         var portId = $("#port-config-status").data("port-id");
         var state = $('input[name="port-config-status"]').bootstrapSwitch('state');
-
-        if (state)
-        {
-            d3.select("#switchport-" + portId).attr("xlink:href", "images/workport.png");
-        }
-        else {
-            d3.select("#switchport-" + portId).attr("xlink:href", "images/portadmin.png");
-        }
-
-        closeConfigWindow();
-
-//        update_port_status(portId, state);
+        update_port_status(portId, state);
     });
 
     $("[name='port-config-status']").bootstrapSwitch("offColor", "danger");
@@ -530,7 +519,7 @@ $pagetitle[] = 'Account Topology';
         event.preventDefault();
         $.ajax({
             type: 'POST',
-            url: 'ajax_form.php',
+            url: 'api/v0/port_status',
             data: { "portid": portId, "status": state},
             dataType: 'json',
             success: function(data) {

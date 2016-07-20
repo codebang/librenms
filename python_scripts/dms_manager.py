@@ -5,7 +5,6 @@ import redis
 import json
 from util import config
 from util import logger
-from util import sendalarm
 
 
 dso_url = config['dso_url']
@@ -19,7 +18,7 @@ parser = OptionParser()
 
 def redis_context(func):
    def inner_func(*args,**kwargs):
-       redis_server = redis.Redis(host=redis_host,port=redis_port)
+       redis_server = redis.Redis(host=redis_host,port=redis_port,socket_connect_timeout=2)
        kwargs['redis_server'] = redis_server
        func(*args,**kwargs)
    return inner_func
@@ -47,7 +46,32 @@ def createswitch(switch_json):
    if r.status_code == 201:
       print 'notify dso to create switch successfully.'
    else:
+      print r.content
       print 'fail to notify dso to create switch.'
+      sys.exit(-1)
+
+def  addport(switch_json):
+   logger.info('start to add port:(%s)' % switch_json)
+   headers = {'content-type': 'application/json'}
+   r = requests.post("%s/switch" % dso_url,data=switch_json,headers=headers)
+   logger.info(r.status_code)
+   logger.info(r.content)
+   if r.status_code == 201:
+      print 'notify dso to add ports successfully.'
+   else:
+      print r.content
+      sys.exit(-1)
+
+def  deleteport(switch_json):
+   logger.info('start to delete port:(%s)' % switch_json)
+   headers = {'content-type': 'application/json'}
+   r = requests.delete("%s/switch" % dso_url,data=switch_json,headers=headers)
+   logger.info(r.status_code)
+   logger.info(r.content)
+   if r.status_code == 200:
+      print 'notify dso to delete ports successfully.'
+   else:
+      print r.content
       sys.exit(-1)
 
 @redis_context
@@ -91,6 +115,20 @@ def getworkstationfordevice(switchip,redis_server):
   else:
      print ''
 
+@redis_context
+def getLocationId(location_name,redis_server):
+   keys = redis_server.hkeys('locations')
+   location_id = None
+   for key in keys:
+      value = redis_server.hget('locations',key)
+      if value == location_name:
+         location_id = key
+   if not location_id:
+     print 'can not find corresponding location id'
+     logger.error("cannot find the location id")
+     sys.exit(-1)
+   else:
+     print location_id
 
 if __name__ == '__main__':
   func_string = args.pop(0)

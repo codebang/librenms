@@ -69,6 +69,7 @@ $app->group(
                 $app->post('/devices', 'authToken', 'add_device')->name('add_device');
                 $app->post('/interfaces/status', 'activate_interfaces')->name('activate_interfaces');
                 $app->get('/topology','get_topology')->name('get_topology');
+                $app->post('/port_status','update_port_status')->name('update_port_status');
                 // api/v0/devices (json data needs to be passed)
                 $app->group(
                     '/devicegroups',

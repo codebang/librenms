@@ -23,15 +23,11 @@ function poll_mactable($switch_manageip,$username,$password,$os){
    return  _exec_python_with_ret("mac_address",$args);
 }
 
-function port_enable($switch_manageip,$username,$password,$os,$ports){
-   $cmd = 'system-view;';
-   foreach($ports as $port_info){
-      $cmd = $cmd."vlan {$port_info['vlan']};quit;interface {$port_info['port']};undo shutdown;port access vlan {$port_info['vlan']};quit;";
-   }
-   $cmd = $cmd.'save;Y;\n';
-   $args = "-d {$switch_manageip} -u {$username} -a {$password} -m {$os} '{$cmd}'";
-   return _exec_python_with_ret("device_executor",$args);
 
+function port_enable($switch_manageip,$username,$password,$os,$ports){
+    $port_info = json_encode($ports);
+    $args = "-d {$switch_manageip} -u {$username} -a {$password} -m {$os} ports_enable '{$port_info}'";
+    return _exec_python_with_ret("device_executor",$args);
 }
 
 function create_switch_for_dms($request_body){
@@ -41,11 +37,20 @@ function create_switch_for_dms($request_body){
 
 
 
-function update_switch_dms($switch_ip,$dms_location){
-   $args = "updateswitch {$switch_ip} {$dms_location}" ;
+function update_switch_for_dms($json_body,$del){
+   if($del){
+       $args = "deleteport '".$json_body."'" ;
+   }
+   else{
+      $args = "addport '".$json_body."'" ;
+   }
    return  _exec_python_with_ret("dms_manager",$args);
 } 
 
+function get_location_id_from_name($dms_location){
+  $args = "getLocationId {$dms_location}";
+  return _exec_python_with_ret("dms_manager",$args);
+}
 
 function list_location(){
   $args = "listlocations";
@@ -79,6 +84,7 @@ function _exec_python_with_ret($script,$args){
    global $config;
    $install_dir = $config['install_dir'];
    $cmd = "python ".$install_dir."/python_scripts/{$script}.py {$args}";
+   #var_dump($cmd);
    exec($cmd,$ret_desc,$ret_code);
    if ($ret_code == 255){
       $result = "FAILURE";
