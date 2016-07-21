@@ -83,7 +83,7 @@ def sendalarmtokakfa(host,item,message):
       kafka_client.close()
 
 
-def log_event(host,message,type,reference):
+def log_event(host,message,type,reference=None):
     db_host = config['db_host']
     user = config['db_user']
     pwd = config['db_pass']
@@ -94,8 +94,13 @@ def log_event(host,message,type,reference):
         db.execute("""select device_id from devices where hostname='%s'""" % (host))
         row = db.fetchone()
         device_id = int(row[0])
-        print """insert into eventlog (host,datetime,message,type,reference) values(%s,'%s','%s',%s,%s) """ % (device_id,datetime.datetime.now(),message,type,reference)
-        db.execute("""insert into eventlog (host,datetime,message,type,reference) values(%s,'%s','%s','%s','%s') """ % (device_id,datetime.datetime.now(),message,'NULL','NULL'))
+        if reference:
+           db.execute(""" select port_id from ports where device_id = '%s' and (ifName = '%s' or ifDescr = '%s')""" % (device_id,reference,reference))
+           row = db.fetchone()
+           reference = row[0]
+        else:
+           reference = 'NULL'
+        db.execute("""insert into eventlog (host,datetime,message,type,reference) values(%s,'%s','%s','%s','%s') """ % (device_id,datetime.datetime.now(),message,type,reference))
         connect.commit()
     except Exception,e:
         print e.message

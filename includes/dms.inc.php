@@ -25,8 +25,8 @@ function poll_mactable($switch_manageip,$username,$password,$os){
 
 
 function port_enable($switch_manageip,$username,$password,$os,$ports){
-    $port_info = json_encode($ports);
-    $args = "-d {$switch_manageip} -u {$username} -a {$password} -m {$os} ports_enable '{$port_info}'";
+    $ports_info = json_encode($ports);
+    $args = "-d {$switch_manageip} -u {$username} -a {$password} -m {$os} ports_enable '{$ports_info}'";
     return _exec_python_with_ret("device_executor",$args);
 }
 
@@ -86,7 +86,7 @@ function _exec_python_with_ret($script,$args){
    $cmd = "python ".$install_dir."/python_scripts/{$script}.py {$args}";
    #var_dump($cmd);
    exec($cmd,$ret_desc,$ret_code);
-   if ($ret_code == 255){
+   if ($ret_code == 255 || $ret_code < 0){ 
       $result = "FAILURE";
    }
    else{

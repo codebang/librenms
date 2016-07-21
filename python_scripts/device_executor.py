@@ -38,6 +38,11 @@ parser.add_option('-p','--port',dest='port',help='ssh port',default=22)
 
 def ports_enable(ports_json,device_connect):
    ports = json.loads(ports_json)
+   for port in ports:
+      speed_limit = int(port['speed_limit'])
+      speed_limit = speed_limit - speed_limit % 64
+      port['speed_limit'] = str(speed_limit)
+
    device_connect.send_command('system-view')
    for port in ports:
       start_event = PortEnableStart(device_connect.host,port['port'],port)
@@ -72,13 +77,17 @@ def ports_enable(ports_json,device_connect):
 
 def port_enable(port,device_connect):
     port_name = port['port']
+    m = re.search('\d',port_name)
+    start_index = m.start()
+    port_type = port_name[:start_index]
+    port_number = port_name[start_index:]
     vlan = port['vlan']
     speed_limit = port['speed_limit']
     device_connect.send_command('vlan %s' % vlan)
     device_connect.send_command('quit')
+    device_connect.send_command('interface %s %s' % (port_type,port_number))
     device_connect.send_command('port access vlan %s' % vlan)
     device_connect.send_command('line-rate outbound %s' % speed_limit)
-    device_connect.send_command('interface %s' % port_name)
     device_connect.send_command('undo shutdown')
 
 
@@ -95,7 +104,7 @@ def port_enable_confirm(port,device_connect):
     start_index = m.start()
     port_type = port_name[:start_index]
     port_number = port_name[start_index:]
-    result_array = device_connect.send_command('display brief interface %s' % port_name)
+    result_array = device_connect.send_command('display brief interface %s %s' % (port_type,port_number))
     state_check = True
     '''
        Interface   Link     Speed  Duplex Type   PVID Description

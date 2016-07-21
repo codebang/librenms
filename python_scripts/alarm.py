@@ -11,13 +11,20 @@ class Event(object):
           4 record to local log
           5 TBD
       """
-      descr = self.render_descritpion()
+      descr = self.render_description()
 
-      log_event(self.host,descr,None,None)
+      if self.interface_name:
+         ref = self.interface_name
+         type = "interface"
+      else:
+         ref = None
+         type = self.event_type
+      
+      log_event(self.host,descr,type,reference = ref)
 
       if self.event_level == 'Critical':
           if config['sender']['kafka_enable']:
-             sendalarmtokakfa(self.host,self.event_type,descr)
+             sendalarmtokakfa(self.host,descr)
              logger.critical(descr)
 
       else:
@@ -32,8 +39,9 @@ class DeviceConnectError(Event):
         self.event_type = "Switch_Connect_Fail"
         self.event_level = "Critical"
         self.context = context
+        self.interface_name = None
 
-    def render_descritpion(self):
+    def render_description(self):
         return self.context['error']
 
 
@@ -43,8 +51,9 @@ class DeviceTypeNotSupport(Event):
         self.event_type = "Device_Type_Not_Support"
         self.event_level = "Critical"
         self.context = context
+        self.interface_name = None
 
-    def render_descritpion(self):
+    def render_description(self):
         return "Device type(%s) is not supported now" % self.context['type']
 
 
@@ -56,13 +65,8 @@ class PortEnableEvent(Event):
 
 
 
-  def render_descritpion(self):
-      desc_array = []
-      header_line = "switch:%s      port:%s      alarm:PortEnableFail" % (self.host,self.interface_name)
-      desc_array.append(header_line)
-      row_line_1 = "Port Enable Flow: config vlan(%s) -> speed_limit(%s) -> undo shutdown" % (self.context['vlan'],self.context['speed_limit'])
-      desc_array.append(row_line_1)
-      return '\n'.join(desc_array)
+  def render_description(self):
+      return "Port[%s] Enable: [vlan(%s)->speed_limit(%s)->undo shutdown]" % (self.interface_name,self.context['vlan'],self.context['speed_limit'])
 
 
 class PortEnableStart(PortEnableEvent):
@@ -73,9 +77,9 @@ class PortEnableStart(PortEnableEvent):
       self.context = context
 
   def render_description(self):
-      desc_1 = PortEnableEvent.render_descritpion(self)
-      desc_2 = "Start to enable port..."
-      return '\n'.join([desc_1,desc_2])
+      desc_1 = PortEnableEvent.render_description(self)
+      desc_2 = "is Starting..."
+      return ' '.join([desc_1,desc_2])
 
 
 class PortEnableEnd(PortEnableEvent):
@@ -86,9 +90,7 @@ class PortEnableEnd(PortEnableEvent):
       self.context = context
 
   def render_description(self):
-      desc_1 = PortEnableEvent.render_descritpion(self)
-      desc_2 = "Success to enable port."
-      return '\n'.join([desc_1,desc_2])
+      return "Success to enable port[%s]" % self.interface_name
 
 
 class PortEnableAlarm(PortEnableEvent):
@@ -100,8 +102,8 @@ class PortEnableAlarm(PortEnableEvent):
       # what we want to do: config vlan -> speed_limit -> undo shutdown
 
 
-  def render_descritpion(self):
-      desc_1 = PortEnableEvent.render_descritpion(self)
+  def render_description(self):
+      desc_1 = PortEnableEvent.render_description(self)
       desc_array = [desc_1]
       desc_array.extend(self.context['status'])
       print desc_array
