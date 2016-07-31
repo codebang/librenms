@@ -1,25 +1,30 @@
 <?php
-
-## Have a look in includes/defaults.inc.php for examples of settings you can set here. DO NOT EDIT defaults.inc.php!
+## Have a look in defaults.inc.php for examples of settings you can set here. DO NOT EDIT defaults.inc.php!
 
 ### Database config
 $config['db_host'] = 'localhost';
-$config['db_user'] = 'USERNAME';
-$config['db_pass'] = 'PASSWORD';
+$config['db_user'] = 'librenms';
+$config['db_pass'] = 'cisco123';
 $config['db_name'] = 'librenms';
-$config['db']['extension'] = 'mysqli';// mysql or mysqli
-
-### Memcached config - We use this to store realtime usage
-$config['memcached']['enable']  = FALSE;
-$config['memcached']['host']    = 'localhost';
-$config['memcached']['port']    = 11211;
+$config['db']['extension'] = "mysqli";// mysql or mysqli
 
 // This is the user LibreNMS will run as
 //Please ensure this user is created and has the correct permissions to your install
 $config['user'] = 'librenms';
 
+### Memcached config - We use this to store realtime usage
+$config['memcached']['enable']  = FALSE;
+$config['memcached']['host']    = "localhost";
+$config['memcached']['port']    = 11211;
+
 ### Locations - it is recommended to keep the default
-#$config['install_dir']  = "/opt/librenms";
+$config['install_dir']  = "/opt/librenms";
+
+$config['redis_server'] = '10.74.113.133';
+#$config['redis_server'] = '192.168.56.12';
+$config['redis_port'] =  6379;
+$config['dso_url'] = 'http://10.74.113.56:8282/dso/sa';
+
 
 ### This should *only* be set if you want to *force* a particular hostname/port
 ### It will prevent the web interface being usable form any other hostname
@@ -28,12 +33,6 @@ $config['user'] = 'librenms';
 ### Enable this to use rrdcached. Be sure rrd_dir is within the rrdcached dir
 ### and that your web server has permission to talk to rrdcached.
 #$config['rrdcached']    = "unix:/var/run/rrdcached.sock";
-
-$config['redis_server'] = '10.74.113.133';
-$config['redis_port'] =  6379;
-$config['dso_url'] = 'http://10.74.113.56:8282/dso/sa';
-$config['kafka_brokers'] = '172.16.2.171:9092';
-$config['kafka_alert_topic'] = 'dms.alarm.vm';
 
 ### Default community
 $config['snmp']['community'] = array("public");
@@ -53,8 +52,34 @@ $config['poller-wrapper']['alerter'] = FALSE;
 # Uncomment the next line to disable daily updates
 #$config['update'] = 0;
 
-# Uncomment to submit callback stats via proxy
-#$config['callback_proxy'] = "hostname:port";
 
-# Set default port association mode for new devices (default: ifIndex)
-#$config['default_port_association_mode'] = 'ifIndex';
+###send_settings
+$config['sender']['kafka_enable'] = TRUE;
+$config['sender']['kafka']['kafka_brokers'] = '192.168.56.12:9092';
+$config['sender']['kafka']['kafka_alert_topic'] = 'dms.alarm.vm';
+
+$config['sender']['syslog_enable'] = TRUE;
+$config['sender']['syslog']['address'] = '/dev/log' ;
+
+$config["enable_location_feature"] = 0;
+$config["device_default_location"] = "默认(未关联楼宇)";
+$config["enable_workspace_lookup"] = 0;
+$config['port_unbind_constant'] = "Unbind";
+
+
+
+$config['os']['comware']['bad_if_regexp'][] = '/^null/i';
+$config['os']['comware']['bad_if_regexp'][] = '/^aux/i';
+$config['os']['comware']['bad_if_regexp'][] = '/^vlan/i';
+$config['os']['comware']['bad_if_regexp'][] = '/^inloopback/i';
+
+$config['os']['ciscosb']['include_iftype'][] = 'ethernetCsmacd';
+$config['os']['ciscosb']['include_iftype'][] = 'gigabitEthernet';
+
+if($config["enable_location_feature"]){
+  $config['front_page'] = 'pages/account-map.inc.php';
+  $config['poller_modules']['mac-address']  = 1;
+}
+else{
+ $config['front_page'] = 'pages/devices.inc.php';
+}
