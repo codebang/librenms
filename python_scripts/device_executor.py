@@ -31,7 +31,10 @@ parser.add_option('-p','--port',dest='port',help='ssh port',default=22)
 (options, args) = parser.parse_args()
 
 
-
+def display_macaddress(device_connect):
+  result_array = device_connect.send_command('display macaddress')
+  return result_array
+  
 
 
 
