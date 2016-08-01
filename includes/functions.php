@@ -676,7 +676,7 @@ function notify_dso_for_create_switch($device){
        print_error($ret_arr['desc'][0]);
    }
    else{
-       print_message($ret_arr['desc'][0]);
+       print_message('notify dso to create swtich successfully');
    }
 
 }
