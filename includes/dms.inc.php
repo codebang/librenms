@@ -11,7 +11,7 @@ function show_config($switch_manageip,$username, $password, $os){
 }
 
 function poll_mactable($switch_manageip,$username,$password,$os){
-   $cmd = 'display mac-address';
+   $cmd = 'display_macaddress';
    $args = "-d {$switch_manageip} -u {$username} -a {$password} -m {$os} '{$cmd}'";
    $ret_arr = _exec_python_with_ret("device_executor",$args);
    if ($ret_arr['result'] == 'FAILURE'){

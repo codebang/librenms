@@ -9,7 +9,6 @@ from netmiko import ConnectHandler
 from optparse import OptionParser
 
 from util import config
-from util import sendalarm
 
 parser = OptionParser()
 parser.add_option('-d','--device',dest='manageip',help='switch manage ip')
