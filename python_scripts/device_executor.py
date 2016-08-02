@@ -41,6 +41,7 @@ def display_macaddress(device_connect):
 
 def ports_enable(ports_json,device_connect):
    ports = json.loads(ports_json)
+   print ports
    for port in ports:
       speed_limit = int(port['speed_limit'])
       speed_limit = speed_limit - speed_limit % 64
@@ -210,6 +211,9 @@ if __name__ == '__main__':
             context['status'] = ssh_excpetion.message
             error = DeviceConnectError(options.managementIp,context)
             error.send()
+            sys.exit(-1)
+        except TypeError,err:
+            print 'type error'
             sys.exit(-1)
     else:
         context = {}

@@ -83,8 +83,7 @@ function getWorkstationForDevice($switch_manageip){
 function _exec_python_with_ret($script,$args){
    global $config;
    $install_dir = $config['install_dir'];
-   $cmd = "python ".$install_dir."/python_scripts/{$script}.py {$args}";
-   #var_dump($cmd);
+   $cmd = "python ".$install_dir."/python_scripts/{$script}.py {$args} 2>&1";
    exec($cmd,$ret_desc,$ret_code);
    if ($ret_code == 255 || $ret_code < 0){ 
       $result = "FAILURE";
@@ -92,11 +91,8 @@ function _exec_python_with_ret($script,$args){
    else{
       $result = "SUCCESS";
    }
-  return array("result" => $result,"desc" =>$ret_desc);
+  return array("result" => $result,"desc" => $ret_desc);
 }
 
 ?>
-
-
-
 

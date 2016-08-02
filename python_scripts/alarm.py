@@ -42,7 +42,7 @@ class DeviceConnectError(Event):
         self.interface_name = None
 
     def render_description(self):
-        return self.context['error']
+        return self.context['status']
 
 
 class DeviceTypeNotSupport(Event):
